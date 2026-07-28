@@ -16,7 +16,7 @@ export default function Hero() {
     <>
       <style jsx>{`
         .ba-hero-container { width: 100%; background-color: transparent; padding-top: 30px; padding-bottom: 0; font-family: 'Cairo', sans-serif; direction: rtl; position: relative; }
-        .ba-hero-container::before { content: ''; position: absolute; top: 200px; left: 0; right: 0; bottom: 0; background-color: #FFF4F2; z-index: -1; }
+        .ba-hero-container::before { content: ''; position: absolute; top: 200px; left: 0; right: 0; bottom: 0; background-color: #ffffff; background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 30px 30px; z-index: -1; }
         .ba-hero-box { width: calc(100% - 40px); max-width: 1100px; margin: 0 auto; border-radius: 20px; position: relative; background: linear-gradient(135deg, #1B2B6B 0%, #2a3a8c 45%, #8B1A3A 100%); box-shadow: 0 16px 40px rgba(27,43,107,0.15); min-height: 380px; }
         .ba-hero-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px; opacity: 0.05; z-index: 1; border-radius: 20px; }
         .ba-hero-img-wrap { position: relative; z-index: 3; width: 100%; display: flex; justify-content: center; align-items: flex-end; margin-top: -340px; pointer-events: none; }

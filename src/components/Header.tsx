@@ -41,7 +41,7 @@ export default function Header() {
           border-bottom: 0 !important;
         }
 
-        body { padding-top: 120px !important; background-color: #FFF4F2 !important; }
+        body { padding-top: 120px !important; background-color: #ffffff !important; background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px) !important; background-size: 30px 30px !important; }
         section, header, nav { border-bottom: none !important; }
 
         @keyframes baLogoReveal3DPremium {
