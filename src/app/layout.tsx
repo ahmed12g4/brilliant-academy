@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "أكاديمية بريلينت | Brilliant Academy",
   description: "منصة تعليمية أونلاين لطلاب مناهج دول الخليج - حصص فردية مع مدرسين متخصصين",
   icons: {
-    icon: "https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png",
+    icon: "/favicon.png",
   },
 };
 
