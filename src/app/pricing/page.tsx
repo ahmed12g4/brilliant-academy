@@ -26,10 +26,19 @@ function PricingContent() {
     <>
       <style>{`
         .ba-pricing-section {
+          background-color: #f5f5f5;
           padding: 40px 5vw 80px;
           text-align: center;
           min-height: 100vh;
-          border-radius: 18px;
+        }
+
+        .ba-pricing-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          background: #ffffff;
+          border-radius: 24px;
+          padding: 60px 40px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
         }
 
         .ba-pricing-header {
@@ -220,6 +229,15 @@ function PricingContent() {
         }
 
         @media (max-width: 768px) {
+          .ba-pricing-section {
+            padding: 20px 4vw 60px;
+          }
+
+          .ba-pricing-container {
+            padding: 30px 15px;
+            border-radius: 16px;
+          }
+
           .ba-pricing-grid {
             grid-template-columns: 1fr !important;
             max-width: 450px;
@@ -245,67 +263,69 @@ function PricingContent() {
         }
       `}</style>
       <section className="ba-pricing-section">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "30px", fontSize: "14px", fontWeight: 600, color: "#666", justifyContent: "flex-start", maxWidth: "1400px", margin: "0 auto 30px" }}>
-          <Link href="/courses" style={{ color: "var(--primary-navy)", textDecoration: "none" }}>المناهج</Link>
-          <span style={{ color: "#ddd" }}>/</span>
-          <Link href={`/grades?country=${country}`} style={{ color: "var(--primary-navy)", textDecoration: "none" }}>{COUNTRY_NAMES[country as Country] || "منهج الكويت"}</Link>
-          <span style={{ color: "#ddd" }}>/</span>
-          <Link href={`/subjects?grade=${grade}&country=${country}`} style={{ color: "var(--primary-navy)", textDecoration: "none" }}>الصف {getGradeName(grade)}</Link>
-          <span style={{ color: "#ddd" }}>/</span>
-          <span>{subject}</span>
-        </div>
+        <div className="ba-pricing-container">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "30px", fontSize: "14px", fontWeight: 600, color: "#666", justifyContent: "flex-start" }}>
+            <Link href="/courses" style={{ color: "var(--primary-navy)", textDecoration: "none" }}>المناهج</Link>
+            <span style={{ color: "#ddd" }}>/</span>
+            <Link href={`/grades?country=${country}`} style={{ color: "var(--primary-navy)", textDecoration: "none" }}>{COUNTRY_NAMES[country as Country] || "منهج الكويت"}</Link>
+            <span style={{ color: "#ddd" }}>/</span>
+            <Link href={`/subjects?grade=${grade}&country=${country}`} style={{ color: "var(--primary-navy)", textDecoration: "none" }}>الصف {getGradeName(grade)}</Link>
+            <span style={{ color: "#ddd" }}>/</span>
+            <span>{subject}</span>
+          </div>
 
-        <div className="ba-pricing-header" style={{ marginBottom: "30px" }}>
-          <h1>باقات مادة <span>{subject}</span></h1>
-          <p style={{ marginBottom: "20px" }}>الصف {getGradeName(grade)} - اختر الباقة المناسبة لك</p>
-          {mental && (
-            <div className="ba-mental-math-note" style={{ margin: "0 auto" }}>
-              <strong>ملاحظة هامة:</strong> المعداد ومذكرة الحل لا تشمل سعر الحصص.
-            </div>
-          )}
-        </div>
+          <div className="ba-pricing-header" style={{ marginBottom: "30px" }}>
+            <h1>باقات مادة <span>{subject}</span></h1>
+            <p style={{ marginBottom: "20px" }}>الصف {getGradeName(grade)} - اختر الباقة المناسبة لك</p>
+            {mental && (
+              <div className="ba-mental-math-note" style={{ margin: "0 auto" }}>
+                <strong>ملاحظة هامة:</strong> المعداد ومذكرة الحل لا تشمل سعر الحصص.
+              </div>
+            )}
+          </div>
 
-        <div className={`ba-pricing-grid ${mental ? "centered" : ""}`}>
-          {mental ? (
-            <div className="ba-price-card">
-              <div className="ba-popular-tag">الأكثر طلباً</div>
-              <h3 className="ba-package-name">باقة الحساب الذهني</h3>
-              <p className="ba-package-desc">كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع (8 حصص)</p>
-              <div className="ba-price-amount">
-                <span className="ba-price-value">{data.eight.aed}</span>
-                <span className="ba-price-currency">درهم</span>
-              </div>
-              <div className="ba-currency-info">
-                <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Kuwait} className="ba-mini-flag" alt="Kuwait" /><span>الكويت:</span></div><span>{data.eight.kwd} دينار</span></div>
-                <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.KSA} className="ba-mini-flag" alt="KSA" /><span>السعودية:</span></div><span>{data.eight.sar} ريال</span></div>
-                <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Qatar} className="ba-mini-flag" alt="Qatar" /><span>قطر:</span></div><span>{data.eight.qar} ريال</span></div>
-              </div>
-              <Link href={`/checkout?package=eight&grade=${grade}&country=${country}&subject=${encodeURIComponent(subject)}`} className="ba-subscribe-btn">اشترك الآن</Link>
-            </div>
-          ) : (
-            (["one", "four", "eight", "twelve"] as const).map((pkg, i) => {
-              const prices = data[pkg];
-              const pkgNames: Record<string, string> = { one: "حصة واحدة فقط", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" };
-              const pkgDescs: Record<string, string> = { one: "مدة الحصة 40 دقيقة", four: "كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع", eight: "كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع", twelve: "كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع" };
-              return (
-                <div className="ba-price-card" key={pkg}>
-                  {i === 2 && <div className="ba-popular-tag">الأكثر طلباً</div>}
-                  <h3 className="ba-package-name">{pkgNames[pkg]}</h3>
-                  <p className="ba-package-desc">{pkgDescs[pkg]}</p>
-                  <div className="ba-price-amount">
-                    <span className="ba-price-value">{prices.aed}</span>
-                    <span className="ba-price-currency">درهم</span>
-                  </div>
-                  <div className="ba-currency-info">
-                    <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Kuwait} className="ba-mini-flag" alt="Kuwait" /><span>الكويت:</span></div><span>{prices.kwd} دينار</span></div>
-                    <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.KSA} className="ba-mini-flag" alt="KSA" /><span>السعودية:</span></div><span>{prices.sar} ريال</span></div>
-                    <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Qatar} className="ba-mini-flag" alt="Qatar" /><span>قطر:</span></div><span>{prices.qar} ريال</span></div>
-                  </div>
-                  <Link href={`/checkout?package=${pkg}&grade=${grade}&country=${country}&subject=${encodeURIComponent(subject)}`} className="ba-subscribe-btn">اشترك الآن</Link>
+          <div className={`ba-pricing-grid ${mental ? "centered" : ""}`}>
+            {mental ? (
+              <div className="ba-price-card">
+                <div className="ba-popular-tag">الأكثر طلباً</div>
+                <h3 className="ba-package-name">باقة الحساب الذهني</h3>
+                <p className="ba-package-desc">كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع (8 حصص)</p>
+                <div className="ba-price-amount">
+                  <span className="ba-price-value">{data.eight.aed}</span>
+                  <span className="ba-price-currency">درهم</span>
                 </div>
-              );
-            })
-          )}
+                <div className="ba-currency-info">
+                  <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Kuwait} className="ba-mini-flag" alt="Kuwait" /><span>الكويت:</span></div><span>{data.eight.kwd} دينار</span></div>
+                  <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.KSA} className="ba-mini-flag" alt="KSA" /><span>السعودية:</span></div><span>{data.eight.sar} ريال</span></div>
+                  <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Qatar} className="ba-mini-flag" alt="Qatar" /><span>قطر:</span></div><span>{data.eight.qar} ريال</span></div>
+                </div>
+                <Link href={`/checkout?package=eight&grade=${grade}&country=${country}&subject=${encodeURIComponent(subject)}`} className="ba-subscribe-btn">اشترك الآن</Link>
+              </div>
+            ) : (
+              (["one", "four", "eight", "twelve"] as const).map((pkg, i) => {
+                const prices = data[pkg];
+                const pkgNames: Record<string, string> = { one: "حصة واحدة فقط", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" };
+                const pkgDescs: Record<string, string> = { one: "مدة الحصة 40 دقيقة", four: "كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع", eight: "كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع", twelve: "كل حصة مدتها 40 دقيقة، لمدة 4 أسابيع" };
+                return (
+                  <div className="ba-price-card" key={pkg}>
+                    {i === 2 && <div className="ba-popular-tag">الأكثر طلباً</div>}
+                    <h3 className="ba-package-name">{pkgNames[pkg]}</h3>
+                    <p className="ba-package-desc">{pkgDescs[pkg]}</p>
+                    <div className="ba-price-amount">
+                      <span className="ba-price-value">{prices.aed}</span>
+                      <span className="ba-price-currency">درهم</span>
+                    </div>
+                    <div className="ba-currency-info">
+                      <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Kuwait} className="ba-mini-flag" alt="Kuwait" /><span>الكويت:</span></div><span>{prices.kwd} دينار</span></div>
+                      <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.KSA} className="ba-mini-flag" alt="KSA" /><span>السعودية:</span></div><span>{prices.sar} ريال</span></div>
+                      <div className="ba-currency-item"><div className="ba-currency-country"><img src={FLAGS.Qatar} className="ba-mini-flag" alt="Qatar" /><span>قطر:</span></div><span>{prices.qar} ريال</span></div>
+                    </div>
+                    <Link href={`/checkout?package=${pkg}&grade=${grade}&country=${country}&subject=${encodeURIComponent(subject)}`} className="ba-subscribe-btn">اشترك الآن</Link>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </section>
     </>

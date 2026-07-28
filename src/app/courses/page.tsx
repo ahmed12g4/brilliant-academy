@@ -27,18 +27,21 @@ function CoursesContent() {
     <>
       <style>{`
         .ba-curriculum-section {
-          background-color: #ffffff;
+          background-color: #f5f5f5;
           font-family: 'Cairo', sans-serif;
           direction: rtl;
           padding: 80px 5vw;
           color: #1B2B6B;
           text-align: center;
           min-height: 100vh;
-          border-radius: 18px;
         }
         .ba-curr-container {
           max-width: 1100px;
           margin: 0 auto;
+          background: #ffffff;
+          border-radius: 24px;
+          padding: 60px 40px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
         }
         .ba-curr-header {
           margin-bottom: 60px;
@@ -175,6 +178,10 @@ function CoursesContent() {
           .ba-curriculum-section {
             padding: 20px 4vw;
             min-height: auto;
+          }
+          .ba-curr-container {
+            padding: 30px 15px;
+            border-radius: 16px;
           }
           .ba-curr-header {
             margin-bottom: 20px;

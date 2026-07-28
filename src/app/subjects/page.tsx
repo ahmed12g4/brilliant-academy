@@ -87,11 +87,19 @@ function SubjectsContent() {
         }
 
         .ba-subjects-section {
-          background-color: #ffffff;
+          background-color: #f5f5f5;
           padding: 40px 5vw 80px;
           text-align: center;
           min-height: 100vh;
-          border-radius: 18px;
+        }
+
+        .ba-subjects-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: #ffffff;
+          border-radius: 24px;
+          padding: 60px 40px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
         }
 
         .ba-subjects-header {
@@ -193,6 +201,15 @@ function SubjectsContent() {
         }
 
         @media (max-width: 650px) {
+          .ba-subjects-section {
+            padding: 20px 4vw 60px;
+          }
+
+          .ba-subjects-container {
+            padding: 30px 15px;
+            border-radius: 16px;
+          }
+
           .ba-subjects-header h1 {
             font-size: 28px;
           }
@@ -213,27 +230,29 @@ function SubjectsContent() {
         }
       `}</style>
       <section className="ba-subjects-section">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "30px", fontSize: "14px", fontWeight: 600, color: "#666", justifyContent: "flex-start", maxWidth: "1200px", margin: "0 auto 30px" }}>
-          <Link href="/courses" style={{ color: "#1B2B6B", textDecoration: "none" }}>المناهج</Link>
-          <span style={{ color: "#ddd" }}>/</span>
-          <Link href={`/grades?country=${country}`} style={{ color: "#1B2B6B", textDecoration: "none" }}>{countryNames[country] || "منهج الكويت"}</Link>
-          <span style={{ color: "#ddd" }}>/</span>
-          <span>الصف {getGradeName(grade)}</span>
-        </div>
-        <div className="ba-subjects-header">
-          <h1>اختر المادة لـ <span>الصف {getGradeName(grade)}</span></h1>
-          <p>اختر المادة للمتابعة مع أفضل مدرسي أكاديمية بريلينت</p>
-        </div>
-        <div className="ba-subjects-grid">
-          {subjects.map((s) => (
-            <Link href={`/pricing?grade=${grade}&country=${country}&subject=${encodeURIComponent(s.name)}`} className="ba-subject-card" key={s.name}>
-              <div className="ba-sub-img-wrapper">
-                <img src={s.img} alt={s.name} className="ba-sub-img" />
-              </div>
-              <h3>{s.name}</h3>
-              <div className="ba-sub-btn">عرض الكورسات</div>
-            </Link>
-          ))}
+        <div className="ba-subjects-container">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "30px", fontSize: "14px", fontWeight: 600, color: "#666", justifyContent: "flex-start" }}>
+            <Link href="/courses" style={{ color: "#1B2B6B", textDecoration: "none" }}>المناهج</Link>
+            <span style={{ color: "#ddd" }}>/</span>
+            <Link href={`/grades?country=${country}`} style={{ color: "#1B2B6B", textDecoration: "none" }}>{countryNames[country] || "منهج الكويت"}</Link>
+            <span style={{ color: "#ddd" }}>/</span>
+            <span>الصف {getGradeName(grade)}</span>
+          </div>
+          <div className="ba-subjects-header">
+            <h1>اختر المادة لـ <span>الصف {getGradeName(grade)}</span></h1>
+            <p>اختر المادة للمتابعة مع أفضل مدرسي أكاديمية بريلينت</p>
+          </div>
+          <div className="ba-subjects-grid">
+            {subjects.map((s) => (
+              <Link href={`/pricing?grade=${grade}&country=${country}&subject=${encodeURIComponent(s.name)}`} className="ba-subject-card" key={s.name}>
+                <div className="ba-sub-img-wrapper">
+                  <img src={s.img} alt={s.name} className="ba-sub-img" />
+                </div>
+                <h3>{s.name}</h3>
+                <div className="ba-sub-btn">عرض الكورسات</div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </>

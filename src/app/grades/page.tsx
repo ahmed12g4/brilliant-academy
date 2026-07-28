@@ -36,18 +36,21 @@ function GradesContent() {
     <>
       <style>{`
         .ba-grades-section {
-          background-color: #ffffff;
+          background-color: #f5f5f5;
           font-family: 'Cairo', sans-serif;
           direction: rtl;
           padding: 40px 5vw 80px;
           color: #1B2B6B;
           min-height: 100vh;
-          border-radius: 18px;
         }
 
         .ba-grades-container {
           max-width: 1100px;
           margin: 0 auto;
+          background: #ffffff;
+          border-radius: 24px;
+          padding: 60px 40px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
         }
 
         .ba-breadcrumbs {
@@ -189,6 +192,11 @@ function GradesContent() {
         @media (max-width: 480px) {
           .ba-grades-section {
             padding: 30px 4vw 60px;
+          }
+
+          .ba-grades-container {
+            padding: 30px 15px;
+            border-radius: 16px;
           }
 
           .ba-grades-header h1 {
