@@ -41,7 +41,7 @@ export default function Header() {
           border-bottom: 0 !important;
         }
 
-        body { padding-top: 120px !important; background-color: #f5f5f5 !important; }
+        body { padding-top: 120px !important; background-color: #FFF4F2 !important; }
         section, header, nav { border-bottom: none !important; }
 
         @keyframes baLogoReveal3DPremium {
