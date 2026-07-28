@@ -41,7 +41,7 @@ export default function Header() {
           border-bottom: 0 !important;
         }
 
-        body { padding-top: 120px !important; background-color: #FFF4F2 !important; }
+        body { padding-top: 120px !important; background-color: #f5f5f5 !important; }
         section, header, nav { border-bottom: none !important; }
 
         @keyframes baLogoReveal3DPremium {
@@ -99,7 +99,7 @@ export default function Header() {
           <li><Link href="/courses">المناهج</Link></li>
           <li><Link href="/about">من نحن</Link></li>
           <li><Link href="/contact">اتصل بنا</Link></li>
-          <li><a href="https://portal.thebrilliant-academy.com" className="ba-btn">تسجيل الدخول</a></li>
+          <li><Link href="/courses" className="ba-btn">سجل الآن</Link></li>
         </ul>
         <button className={`ba-burger ${open ? "open" : ""}`} id="baBurger" onClick={() => setOpen(!open)} aria-label="القائمة">
           <span></span><span></span><span></span>
@@ -112,7 +112,7 @@ export default function Header() {
           <li><Link href="/courses" onClick={() => setOpen(false)}>المناهج</Link></li>
           <li><Link href="/about" onClick={() => setOpen(false)}>من نحن</Link></li>
           <li><Link href="/contact" onClick={() => setOpen(false)}>اتصل بنا</Link></li>
-          <li><a href="https://portal.thebrilliant-academy.com" className="mob-btn">تسجيل الدخول</a></li>
+          <li><Link href="/courses" className="mob-btn" onClick={() => setOpen(false)}>سجل الآن</Link></li>
         </ul>
       </div>
     </>
