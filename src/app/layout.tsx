@@ -4,9 +4,6 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "أكاديمية بريلينت | Brilliant Academy",
   description: "منصة تعليمية أونلاين لطلاب مناهج دول الخليج - حصص فردية مع مدرسين متخصصين",
-  icons: {
-    icon: "/favicon.png",
-  },
 };
 
 export default function RootLayout({
@@ -17,7 +14,8 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className="h-full antialiased">
       <head>
-        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="shortcut icon" type="image/png" href="/favicon.png" />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
