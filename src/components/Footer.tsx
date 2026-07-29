@@ -73,7 +73,6 @@ export default function Footer() {
               <li><Link href="/courses">المناهج</Link></li>
               <li><Link href="/about">من نحن</Link></li>
               <li><Link href="/contact">اتصل بنا</Link></li>
-              <li><a href="https://portal.thebrilliant-academy.com">تسجيل الدخول</a></li>
               <li><Link href="/refund">سياسة الاسترجاع</Link></li>
               <li><Link href="/terms">الشروط والاحكام</Link></li>
             </ul>
