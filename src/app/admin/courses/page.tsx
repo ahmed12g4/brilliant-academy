@@ -5,6 +5,12 @@ import Link from 'next/link'
 export default function AdminCourses() {
   const [courses, setCourses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [filterSubject, setFilterSubject] = useState('all')
+  const [filterGrade, setFilterGrade] = useState('all')
+
+  const subjects = ['لغة عربية', 'لغة انجليزية', 'رياضيات', 'علوم', 'قرآن كـريم', 'تربية إسلامية', 'حساب ذهني', 'اجتماعيات', 'فيزياء', 'كيما', 'أحياء', 'لغة فرنسية', 'جيولوجيا', 'جغرافي', 'تاريخ']
+  const gradeLabels = { 'group_1_5': 'ابتدائي', 'group_6_9': 'متوسط', 'group_10_11': 'ثانوي', 'grade_12': 'ثانوي عام', 'mental_math': 'حساب ذهني' }
+  const gradeKeys = ['group_1_5', 'group_6_9', 'group_10_11', 'grade_12', 'mental_math']
 
   useEffect(() => {
     async function fetchCourses() {
@@ -17,6 +23,12 @@ export default function AdminCourses() {
     }
     fetchCourses()
   }, [])
+
+  const filteredCourses = courses.filter((c: any) => {
+    if (filterSubject !== 'all' && c.subject !== filterSubject) return false
+    if (filterGrade !== 'all' && c.gradeLevel !== filterGrade) return false
+    return true
+  })
 
   const handleDelete = async (slug: string) => {
     if (!confirm('هل أنت متأكد من حذف هذا الكورس؟')) return
@@ -32,146 +44,210 @@ export default function AdminCourses() {
       background: '#f5f5f5',
       padding: '40px 5vw'
     }}>
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
+      <header style={{
         background: '#ffffff',
-        borderRadius: '24px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.06)',
-        overflow: 'hidden'
+        borderBottom: '3px solid #8B1A3A',
+        padding: '15px 40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+        maxWidth: '1200px',
+        margin: '0 auto 30px',
+        borderRadius: '0 0 18px 18px'
       }}>
-        <div style={{
-          background: 'linear-gradient(135deg, #1B2B6B 0%, #2a3a8c 50%, #8B1A3A 100%)',
-          padding: '30px 40px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img
+            src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
+            alt="Logo"
+            style={{ height: '42px', width: 'auto' }}
+          />
           <div>
-            <h1 style={{ color: '#ffffff', fontWeight: 900, margin: 0, fontSize: '24px' }}>
-              📚 إدارة الكورسات
-            </h1>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '5px 0 0', fontSize: '14px', fontWeight: 600 }}>
-              اضيف كورسات جديدة وعدّلها واحذفها
-            </p>
+            <span style={{ color: '#1B2B6B', fontWeight: 800, fontSize: '16px', display: 'block' }}>
+              لوحة تحكم أكاديمية بريلينت
+            </span>
+            <span style={{ color: '#888', fontSize: '12px', fontWeight: 600 }}>
+              إدارة الكورسات
+            </span>
           </div>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault()
-              document.cookie = 'admin_pass=; path=/; max-age=0'
-              window.location.href = '/admin/login'
+        </div>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault()
+            if (!confirm('هل أنت متأكد من خروجك؟')) return
+            document.cookie = 'admin_pass=; path=/; max-age=0'
+            window.location.href = '/admin/login'
+          }}
+        >
+          <button
+            type="submit"
+            style={{
+              padding: '9px 22px',
+              background: '#8B1A3A',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '50px',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              fontFamily: 'Cairo'
             }}
           >
-            <button
-              type="submit"
-              style={{
-                padding: '10px 22px',
-                background: 'rgba(255,255,255,0.15)',
-                color: '#fff',
-                border: '2px solid rgba(255,255,255,0.3)',
-                borderRadius: '50px',
-                fontSize: '13px',
-                fontWeight: 800,
-                cursor: 'pointer',
-                fontFamily: 'Cairo'
-              }}
-            >
-              خروج
-            </button>
-          </form>
+            خروج ✕
+          </button>
+        </form>
+      </header>
+
+      <main style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexWrap: 'wrap', gap: '15px' }}>
+          <div>
+            <h1 style={{ color: '#1B2B6B', fontWeight: 900, margin: 0, fontSize: '26px' }}>إدارة الكورسات</h1>
+            <p style={{ color: '#888', fontSize: '13px', margin: '3px 0 0', fontWeight: 600 }}>
+              تعديل وحذف الكورسات الموجودة في المنصة
+            </p>
+          </div>
+          <Link href="/admin/courses/new">
+            <a style={{
+              padding: '14px 28px',
+              background: '#8B1A3A',
+              color: '#fff',
+              borderRadius: '50px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontFamily: 'Cairo',
+              boxShadow: '0 4px 15px rgba(139,26,58,0.3)',
+              display: 'inline-block'
+            }}>
+              ➕ إضافة كورس جديد
+            </a>
+          </Link>
         </div>
-        <div style={{ padding: '30px 40px' }}>
-          <div style={{ marginBottom: '25px' }}>
+
+        <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexWrap: 'wrap' }}>
+          <select
+            value={filterSubject}
+            onChange={(e) => setFilterSubject(e.target.value)}
+            style={{
+              padding: '12px 16px',
+              borderRadius: '12px',
+              border: '2px solid #eee',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#1B2B6B',
+              fontFamily: 'Cairo',
+              background: '#fff',
+              minWidth: '180px'
+            }}
+          >
+            <option value="all">جميع المواد</option>
+            {subjects.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <select
+            value={filterGrade}
+            onChange={(e) => setFilterGrade(e.target.value)}
+            style={{
+              padding: '12px 16px',
+              borderRadius: '12px',
+              border: '2px solid #eee',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#1B2B6B',
+              fontFamily: 'Cairo',
+              background: '#fff',
+              minWidth: '180px'
+            }}
+          >
+            <option value="all">جميع المراحل</option>
+            {gradeKeys.map((g: string) => (
+              <option key={g} value={g}>{gradeLabels[g as keyof typeof gradeLabels]}</option>
+            ))}
+          </select>
+        </div>
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px' }}>
+            <p style={{ color: '#999', fontSize: '16px', fontWeight: 600 }}>⏳ جاري التحميل...</p>
+          </div>
+        ) : filteredCourses.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px', background: '#fafafa', borderRadius: '16px' }}>
+            <div style={{ fontSize: '50px', marginBottom: '10px' }}>📚</div>
+            <p style={{ color: '#888', fontSize: '16px', fontWeight: 700, marginBottom: '15px' }}>لا توجد كورسات</p>
             <Link href="/admin/courses/new">
               <a style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '14px 28px',
-                background: 'linear-gradient(135deg, #1B2B6B 0%, #2a3a8c 100%)',
+                display: 'inline-block',
+                padding: '14px 30px',
+                background: '#1B2B6B',
                 color: '#fff',
                 borderRadius: '50px',
                 fontWeight: 800,
                 textDecoration: 'none',
-                fontSize: '15px',
-                boxShadow: '0 4px 15px rgba(27,43,107,0.2)',
+                fontSize: '14px',
                 fontFamily: 'Cairo'
               }}>
-                ➕ إضافة كورس جديد
+                أضف أول كورس
               </a>
             </Link>
           </div>
-
-          {loading ? (
-            <p style={{ textAlign: 'center', padding: '40px 0', color: '#999', fontWeight: 600 }}>جاري التحميل...</p>
-          ) : courses.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '50px 20px', background: '#fafafa', borderRadius: '16px' }}>
-              <div style={{ fontSize: '60px', marginBottom: '15px' }}>📚</div>
-              <p style={{ color: '#888', fontSize: '16px', fontWeight: 700, marginBottom: '20px' }}>لا توجد كورسات بعد</p>
-              <Link href="/admin/courses/new">
-                <a style={{
-                  display: 'inline-block',
-                  padding: '14px 30px',
-                  background: '#8B1A3A',
-                  color: '#fff',
-                  borderRadius: '50px',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  fontSize: '15px',
-                  fontFamily: 'Cairo'
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px' }}>
+            {filteredCourses.map((c: any) => (
+              <div key={c.id} style={{
+                background: '#ffffff',
+                borderRadius: '18px',
+                overflow: 'hidden',
+                border: '1px solid rgba(27,43,107,0.08)',
+                boxShadow: '0 8px 25px rgba(139,26,58,0.05)'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #1B2B6B 0%, #2a3a8c 50%, #8B1A3A 100%)',
+                  padding: '18px 20px'
                 }}>
-                  أضف أول كورس
-                </a>
-              </Link>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
-              {courses.map((c: any) => (
-                <div key={c.id} style={{
-                  background: '#fff',
-                  borderRadius: '18px',
-                  overflow: 'hidden',
-                  border: '1px solid rgba(27,43,107,0.08)',
-                  boxShadow: '0 8px 25px rgba(139,26,58,0.05)',
-                  transition: 'transform 0.3s, box-shadow 0.3s'
-                }}>
-                  <div style={{
-                    background: 'linear-gradient(135deg, #1B2B6B 0%, #8B1A3A 100%)',
-                    padding: '20px',
-                    textAlign: 'center'
-                  }}>
-                    <h3 style={{ color: '#fff', fontWeight: 900, margin: 0, fontSize: '18px' }}>{c.name}</h3>
+                  <h3 style={{ color: '#ffffff', fontWeight: 900, margin: 0, fontSize: '16px' }}>{c.name}</h3>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
                     <span style={{
                       background: 'rgba(255,255,255,0.2)',
                       color: '#fff',
-                      padding: '6px 16px',
+                      padding: '3px 10px',
                       borderRadius: '50px',
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      display: 'inline-block',
-                      marginTop: '8px'
+                      fontSize: '11px',
+                      fontWeight: 700
+                    }}>
+                      {subjects.includes(c.subject || '') ? c.subject : 'عام'}
+                    </span>
+                    <span style={{
+                      background: 'rgba(255,255,255,0.2)',
+                      color: '#fff',
+                      padding: '3px 10px',
+                      borderRadius: '50px',
+                      fontSize: '11px',
+                      fontWeight: 700
+                    }}>
+                      {gradeLabels[c.gradeLevel as keyof typeof gradeLabels] || c.gradeLevel}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ padding: '15px 20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ color: '#888', fontSize: '12px', fontWeight: 600, direction: 'ltr', display: 'inline-block', background: '#f0f0ff', padding: '3px 8px', borderRadius: '6px' as any }}>
+                      /course/{c.slug}
+                    </span>
+                    <span style={{
+                      color: '#8B1A3A',
+                      fontSize: '18px',
+                      fontWeight: 900
                     }}>
                       {c.price} درهم
                     </span>
                   </div>
-                  <div style={{ padding: '15px 20px' }}>
-                    {c.description && (
-                      <p style={{ color: '#666', fontSize: '13px', lineHeight: '1.5', marginBottom: '12px' }}>{c.description}</p>
-                    )}
-                    <span style={{
-                      background: '#f0f0ff',
-                      color: '#1B2B6B',
-                      padding: '4px 10px',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      direction: 'ltr',
-                      display: 'inline-block'
-                    }}>
-                      /course/{c.slug}
-                    </span>
-                  </div>
-                  <div style={{ padding: '0 20px 15px', display: 'flex', gap: '10px' }}>
+                  {c.description && (
+                    <p style={{ color: '#999', fontSize: '12px', lineHeight: '1.4', marginBottom: '12px' }}>
+                      {c.description}
+                    </p>
+                  )}
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     <Link href={`/admin/courses/edit/${c.slug}`}>
                       <a style={{
                         flex: 1,
@@ -207,11 +283,11 @@ export default function AdminCourses() {
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   )
 }
