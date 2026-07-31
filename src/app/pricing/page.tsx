@@ -23,7 +23,7 @@ function PricingContent() {
   useEffect(() => {
     async function fetchCourses() {
       try {
-        const res = await fetch('/api/courses');
+        const res = await fetch('/api/courses', { cache: 'no-store' });
         const data = await res.json();
         const filtered = data.filter((c: any) => {
           if (c.gradeLevel !== grade) return false;
