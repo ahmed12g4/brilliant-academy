@@ -1,26 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-let kv: any = null
-try {
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    const kvModule = await import('@vercel/kv')
-    kv = kvModule.kv
-  }
-} catch {
-  kv = null
-}
-
 const memoryStore: Record<string, string> = {}
 
 async function hgetall(key: string) {
-  if (kv) {
-    try {
-      const result = await kv.hgetall(key)
-      return result || {}
-    } catch {
-      return {}
-    }
-  }
   const prefix = key + ':'
   const result: Record<string, string> = {}
   for (const k of Object.keys(memoryStore)) {
@@ -32,14 +14,6 @@ async function hgetall(key: string) {
 }
 
 async function hset(key: string, values: Record<string, string>) {
-  if (kv) {
-    try {
-      await kv.hset(key, values)
-      return
-    } catch {
-      // fall through to memory
-    }
-  }
   const prefix = key + ':'
   for (const [field, value] of Object.entries(values)) {
     memoryStore[prefix + field] = value
@@ -47,26 +21,10 @@ async function hset(key: string, values: Record<string, string>) {
 }
 
 async function hget(key: string, field: string) {
-  if (kv) {
-    try {
-      const result = await kv.hget(key, field)
-      return result as string | null
-    } catch {
-      return null
-    }
-  }
   return memoryStore[key + ':' + field] || null
 }
 
 async function hdel(key: string, field: string) {
-  if (kv) {
-    try {
-      await kv.hdel(key, field)
-      return
-    } catch {
-      return
-    }
-  }
   delete memoryStore[key + ':' + field]
 }
 
