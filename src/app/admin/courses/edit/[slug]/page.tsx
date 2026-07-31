@@ -82,7 +82,7 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
           </form>
         </div>
         <div style={{ padding: '30px' }}>
-          <Link href="/admin/courses"><a style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '13px', fontWeight: 700, display: 'inline-block', marginBottom: '20px' }}>← رجوع</a></Link>
+          <Link href="/admin/courses" style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '13px', fontWeight: 700, display: 'inline-block', marginBottom: '20px' }}>← رجوع</Link>
           <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '5px', fontSize: '20px' }}>تعديل الكورس</h2>
           <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>عدّل البيانات المطلوبة</p>
           {error && <p style={{ color: '#d32f2f', marginBottom: '12px', fontSize: '13px', fontWeight: 600 }}>{error}</p>}

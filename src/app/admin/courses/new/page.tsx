@@ -69,7 +69,7 @@ export default function NewCourse() {
             <img src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png" alt="Logo" style={{ height: '38px', width: 'auto' }} />
             <span style={{ color: '#ffffff', fontWeight: 800, fontSize: '15px' }}>إضافة كورس جديد</span>
           </div>
-          <Link href="/admin/courses"><a style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}>← رجوع للكورسات</a></Link>
+          <Link href="/admin/courses" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}>← رجوع للكورسات</Link>
         </div>
 
         <div style={{ padding: '30px' }}>

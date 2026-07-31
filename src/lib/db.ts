@@ -7,12 +7,71 @@ const useFallback = !process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOK
 
 const FALLBACK_FILE = path.join(process.cwd(), 'kv_fallback.json');
 
-// Initialize fallback file if it doesn't exist
-if (useFallback && !fs.existsSync(FALLBACK_FILE)) {
-  try {
-    fs.writeFileSync(FALLBACK_FILE, JSON.stringify({ keys: {}, hashes: {} }, null, 2), 'utf8');
-  } catch (e) {
-    console.error("Failed to initialize local fallback DB file:", e);
+const defaultSeededData = {
+  keys: {},
+  hashes: {
+    courses: {
+      "arabic-grade6-kuwait": JSON.stringify({
+        id: "arabic-grade6-kuwait",
+        name: "لغة عربية - الصف السادس",
+        price: 150,
+        description: "كورس اللغة العربية المنهجي لطلاب الصف السادس في دولة الكويت، شرح مبسط لجميع القواعد النحوية والنصوص.",
+        imageUrl: "https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69aee30bace6475935e13e29.jpg",
+        subject: "لغة عربية",
+        gradeLevel: 6,
+        country: "Kuwait",
+        slug: "arabic-grade6-kuwait",
+        createdAt: new Date().toISOString()
+      }),
+      "math-grade10-ksa": JSON.stringify({
+        id: "math-grade10-ksa",
+        name: "رياضيات - الصف العاشر",
+        price: 180,
+        description: "شرح منهج الرياضيات المطور لطلاب الصف العاشر في المملكة العربية السعودية، يغطي الجبر والهندسة وحساب المثلثات.",
+        imageUrl: "https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69aee30b7c2702346932011a.jpg",
+        subject: "رياضيات",
+        gradeLevel: 10,
+        country: "KSA",
+        slug: "math-grade10-ksa",
+        createdAt: new Date().toISOString()
+      }),
+      "science-grade3-uae": JSON.stringify({
+        id: "science-grade3-uae",
+        name: "علوم - الصف الثالث",
+        price: 140,
+        description: "كورس العلوم التفاعلي الممتع لطلاب الصف الثالث في دولة الإمارات، مع تجارب وأنشطة تفاعلية مشوقة.",
+        imageUrl: "https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69aee30b5a8a19b7b8c830e8.jpg",
+        subject: "علوم",
+        gradeLevel: 3,
+        country: "UAE",
+        slug: "science-grade3-uae",
+        createdAt: new Date().toISOString()
+      })
+    }
+  }
+};
+
+// Initialize fallback file if it doesn't exist or is empty
+if (useFallback) {
+  let shouldSeed = true;
+  if (fs.existsSync(FALLBACK_FILE)) {
+    try {
+      const content = fs.readFileSync(FALLBACK_FILE, 'utf8');
+      const parsed = JSON.parse(content);
+      if (parsed.hashes && parsed.hashes.courses && Object.keys(parsed.hashes.courses).length > 0) {
+        shouldSeed = false;
+      }
+    } catch {
+      shouldSeed = true;
+    }
+  }
+
+  if (shouldSeed) {
+    try {
+      fs.writeFileSync(FALLBACK_FILE, JSON.stringify(defaultSeededData, null, 2), 'utf8');
+    } catch (e) {
+      console.error("Failed to initialize local fallback DB file:", e);
+    }
   }
 }
 
