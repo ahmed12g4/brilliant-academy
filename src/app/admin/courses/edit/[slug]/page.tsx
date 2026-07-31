@@ -9,6 +9,8 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
   const [description, setDescription] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [subject, setSubject] = useState('')
+  const [gradeLevel, setGradeLevel] = useState('')
+  const [country, setCountry] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -26,6 +28,8 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
           setDescription(course.description || '')
           setImageUrl(course.imageUrl || '')
           setSubject(course.subject || '')
+          setGradeLevel(String(course.gradeLevel || ''))
+          setCountry(course.country || '')
         }
       } catch {}
       setLoading(false)
@@ -40,7 +44,7 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
     const res = await fetch('/api/courses', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, price: parseFloat(price), description, slug: params.slug, imageUrl, subject })
+      body: JSON.stringify({ name, price: parseFloat(price), description, slug: params.slug, imageUrl, subject, gradeLevel: parseInt(gradeLevel), country })
     })
     const data = await res.json()
     if (data.error) {
@@ -78,13 +82,34 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
           </form>
         </div>
         <div style={{ padding: '30px' }}>
-          <Link href="/admin/courses">
-            <a style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '13px', fontWeight: 700, display: 'inline-block', marginBottom: '20px' }}>← رجوع</a>
-          </Link>
+          <Link href="/admin/courses"><a style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '13px', fontWeight: 700, display: 'inline-block', marginBottom: '20px' }}>← رجوع</a></Link>
           <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '5px', fontSize: '20px' }}>تعديل الكورس</h2>
           <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>عدّل البيانات المطلوبة</p>
           {error && <p style={{ color: '#d32f2f', marginBottom: '12px', fontSize: '13px', fontWeight: 600 }}>{error}</p>}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>الدولة</label>
+              <select value={country} onChange={(e) => setCountry(e.target.value)} required style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }}>
+                <option value="">اختر الدولة</option>
+                <option value="UAE">منهج الإمارات</option>
+                <option value="Kuwait">منهج الكويت</option>
+                <option value="Qatar">منهج قطر</option>
+                <option value="KSA">منهج السعودية</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>الصف</label>
+              <select value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} required style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }}>
+                <option value="">اختر الصف</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
+                  <option key={g} value={String(g)}>الصف {g}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>المادة</label>
+              <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} required style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }} />
+            </div>
             <div>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>عنوان الكورس</label>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }} />

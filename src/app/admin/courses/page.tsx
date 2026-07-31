@@ -24,6 +24,8 @@ export default function AdminCourses() {
     setCourses(courses.filter((c: any) => c.slug !== slug))
   }
 
+  const countryNames = { UAE: 'منهج الإمارات', Kuwait: 'منهج الكويت', Qatar: 'منهج قطر', KSA: 'منهج السعودية' }
+
   return (
     <div style={{
       fontFamily: 'Cairo',
@@ -152,6 +154,18 @@ export default function AdminCourses() {
                 }}>
                   <h3 style={{ color: '#ffffff', fontWeight: 900, margin: 0, fontSize: '16px' }}>{c.name}</h3>
                   <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                    {c.country && (
+                      <span style={{
+                        background: 'rgba(255,255,255,0.2)',
+                        color: '#fff',
+                        padding: '3px 10px',
+                        borderRadius: '50px',
+                        fontSize: '11px',
+                        fontWeight: 700
+                      }}>
+                        {countryNames[c.country as keyof typeof countryNames] || c.country}
+                      </span>
+                    )}
                     <span style={{
                       background: 'rgba(255,255,255,0.2)',
                       color: '#fff',
@@ -170,7 +184,7 @@ export default function AdminCourses() {
                       fontSize: '11px',
                       fontWeight: 700
                     }}>
-                      {c.gradeLevel || 'عام'}
+                      {c.gradeLevel ? `الصف ${c.gradeLevel}` : 'عام'}
                     </span>
                   </div>
                 </div>
