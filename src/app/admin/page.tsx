@@ -1,20 +1,11 @@
 'use client'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+
+const SUBJECTS_COUNT = 15
+const PACKAGES = ['حصة واحدة', 'باقة 4 حصص', 'باقة 8 حصص', 'باقة 12 حصة']
+const GROUPS = ['ابتدائي', 'متوسط', 'ثانوي', 'حساب ذهني']
 
 export default function AdminPage() {
-  const [coursesCount, setCoursesCount] = useState(0)
-
-  useEffect(() => {
-    async function fetchCourses() {
-      try {
-        const res = await fetch('/api/courses')
-        const data = await res.json()
-        setCoursesCount(data.length)
-      } catch {}
-    }
-    fetchCourses()
-  }, [])
 
   return (
     <div style={{
@@ -54,6 +45,7 @@ export default function AdminPage() {
         <form
           onSubmit={async (e) => {
             e.preventDefault()
+            if (!confirm('هل أنت متأكد من خروجك من لوحة التحكم؟')) return
             document.cookie = 'admin_pass=; path=/; max-age=0'
             window.location.href = '/admin/login'
           }}
@@ -96,8 +88,8 @@ export default function AdminPage() {
             border: '1px solid rgba(27,43,107,0.06)'
           }}>
             <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
-            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>{coursesCount}</div>
-            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>إجمالي الكورسات</div>
+            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>75</div>
+            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد الكورسات والباقات</div>
           </div>
           <div style={{
             background: '#ffffff',
@@ -107,8 +99,8 @@ export default function AdminPage() {
             border: '1px solid rgba(27,43,107,0.06)'
           }}>
             <div style={{ fontSize: '32px', marginBottom: '8px' }}>📖</div>
-            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>15</div>
-            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد المواد</div>
+            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>5</div>
+            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد المراحل</div>
           </div>
           <div style={{
             background: '#ffffff',
@@ -118,8 +110,8 @@ export default function AdminPage() {
             border: '1px solid rgba(27,43,107,0.06)'
           }}>
             <div style={{ fontSize: '32px', marginBottom: '8px' }}>⭐</div>
-            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>5</div>
-            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>المراحل الدراسية</div>
+            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>15</div>
+            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد المواد</div>
           </div>
         </div>
 

@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation'
 export default function AdminLogin() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
     const res = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -20,6 +23,7 @@ export default function AdminLogin() {
     } else {
       setError('كلمة المرور غير صحيحة')
     }
+    setLoading(false)
   }
 
   return (
@@ -109,21 +113,22 @@ export default function AdminLogin() {
             </div>
             <button
               type="submit"
+              disabled={loading}
               style={{
                 padding: '16px',
-                background: 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
+                background: loading ? '#ccc' : 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '50px',
                 fontSize: '17px',
                 fontWeight: 800,
-                cursor: 'pointer',
+                cursor: loading ? 'not-allowed' : 'pointer',
                 fontFamily: 'Cairo',
                 boxShadow: '0 4px 15px rgba(139,26,58,0.3)',
                 transition: 'opacity 0.3s'
               }}
             >
-              دخول ←
+              {loading ? '⏳ جاري التحقق...' : 'دخول ←'}
             </button>
           </form>
         </div>
