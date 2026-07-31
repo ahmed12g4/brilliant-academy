@@ -1,47 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const memoryStore: Record<string, string> = {}
-
-async function hgetall(key: string) {
-  const prefix = key + ':'
-  const result: Record<string, string> = {}
-  for (const k of Object.keys(memoryStore)) {
-    if (k.startsWith(prefix)) {
-      result[k.slice(prefix.length)] = memoryStore[k]
-    }
-  }
-  return result
-}
-
-async function hset(key: string, values: Record<string, string>) {
-  const prefix = key + ':'
-  for (const [field, value] of Object.entries(values)) {
-    memoryStore[prefix + field] = value
-  }
-}
-
-async function hget(key: string, field: string) {
-  return memoryStore[key + ':' + field] || null
-}
-
-async function hdel(key: string, field: string) {
-  delete memoryStore[key + ':' + field]
-}
+import { kv } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const slug = searchParams.get('slug')
 
   if (slug) {
-    const course = await hget('courses', slug)
+    const course = await kv.hget('courses', slug) as string | null
     if (course) {
       return NextResponse.json([JSON.parse(course)])
     }
     return NextResponse.json([])
   }
 
-  const courses = await hgetall('courses')
-  return NextResponse.json(Object.values(courses))
+  const courses = await kv.hgetall('courses') as Record<string, string> | null
+  if (!courses) {
+    return NextResponse.json([])
+  }
+  
+  const parsedCourses = Object.values(courses).map(c => JSON.parse(c))
+  return NextResponse.json(parsedCourses)
 }
 
 export async function POST(req: NextRequest) {
@@ -66,7 +44,7 @@ export async function POST(req: NextRequest) {
     createdAt: now
   }
 
-  await hset('courses', { [slug]: JSON.stringify(course) })
+  await kv.hset('courses', { [slug]: JSON.stringify(course) })
 
   return NextResponse.json(course)
 }
@@ -79,7 +57,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'البيانات ناقصة' }, { status: 400 })
   }
 
-  const existing = await hget('courses', slug)
+  const existing = await kv.hget('courses', slug) as string | null
   if (!existing) {
     return NextResponse.json({ error: 'الكورس غير موجود' }, { status: 404 })
   }
@@ -99,7 +77,7 @@ export async function PUT(req: NextRequest) {
     updatedAt: new Date().toISOString()
   }
 
-  await hset('courses', { [slug]: JSON.stringify(course) })
+  await kv.hset('courses', { [slug]: JSON.stringify(course) })
 
   return NextResponse.json(course)
 }
@@ -112,7 +90,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'محدد الكورس' }, { status: 400 })
   }
 
-  await hdel('courses', slug)
+  await kv.hdel('courses', slug)
 
   return NextResponse.json({ success: true })
 }

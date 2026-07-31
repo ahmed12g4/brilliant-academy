@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv'
+import { kv } from '@/lib/db'
 import Link from 'next/link'
 
 export default async function CoursePage({ params }: { params: { slug: string } }) {

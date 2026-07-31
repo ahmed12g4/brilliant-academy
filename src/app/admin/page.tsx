@@ -1,18 +1,52 @@
 'use client'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const SUBJECTS_COUNT = 15
-const PACKAGES = ['حصة واحدة', 'باقة 4 حصص', 'باقة 8 حصص', 'باقة 12 حصة']
-const GROUPS = ['ابتدائي', 'متوسط', 'ثانوي', 'حساب ذهني']
-
 export default function AdminPage() {
+  const [stats, setStats] = useState({
+    coursesCount: 0,
+    paidCount: 0,
+    pendingCount: 0,
+    totalRevenue: 0
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [coursesRes, ordersRes] = await Promise.all([
+          fetch('/api/courses'),
+          fetch('/api/admin/orders')
+        ])
+        
+        const courses = await coursesRes.json()
+        const orders = await ordersRes.json()
+
+        const paid = orders.filter((o: any) => o.status === 'paid')
+        const pending = orders.filter((o: any) => o.status === 'pending')
+        const revenue = paid.reduce((acc: number, curr: any) => acc + (Number(curr.price_aed) || 0), 0)
+
+        setStats({
+          coursesCount: Array.isArray(courses) ? courses.length : 0,
+          paidCount: paid.length,
+          pendingCount: pending.length,
+          totalRevenue: revenue
+        })
+      } catch (e) {
+        console.error("Failed to fetch dashboard stats:", e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
   return (
     <div style={{
       fontFamily: 'Cairo',
       direction: 'rtl',
       minHeight: '100vh',
-      background: '#f5f5f5',
+      background: '#f8fafc',
       padding: '40px 5vw'
     }}>
       <header style={{
@@ -25,7 +59,7 @@ export default function AdminPage() {
         boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
         maxWidth: '1200px',
         margin: '0 auto 30px',
-        borderRadius: '0 0 18px 18px'
+        borderRadius: '16px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img
@@ -75,114 +109,203 @@ export default function AdminPage() {
             أهلاً بك في لوحة التحكم 🎓
           </h1>
           <p style={{ color: '#666', fontSize: '14px', marginTop: '5px', fontWeight: 600 }}>
-            إدارة الكورسات والمواد والأسعار في منصة أكاديمية بريلينت
+            إدارة الكورسات والمواد وروابط الدفع والفواتير في منصة أكاديمية بريلينت
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '35px' }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-            border: '1px solid rgba(27,43,107,0.06)'
-          }}>
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
-            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>75</div>
-            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد الكورسات والباقات</div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <p style={{ color: '#888', fontSize: '16px', fontWeight: 600 }}>⏳ جاري تحميل الإحصائيات...</p>
           </div>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-            border: '1px solid rgba(27,43,107,0.06)'
-          }}>
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>📖</div>
-            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>5</div>
-            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد المراحل</div>
-          </div>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '16px',
-            padding: '24px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-            border: '1px solid rgba(27,43,107,0.06)'
-          }}>
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>⭐</div>
-            <div style={{ fontSize: '30px', fontWeight: 900, color: '#1B2B6B' }}>15</div>
-            <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد المواد</div>
-          </div>
-        </div>
+        ) : (
+          <>
+            {/* Stats Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '35px' }}>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>💰</div>
+                <div style={{ fontSize: '28px', fontWeight: 900, color: '#1B2B6B' }}>
+                  {stats.totalRevenue} <span style={{ fontSize: '14px', fontWeight: 700 }}>درهم</span>
+                </div>
+                <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>إجمالي الإيرادات المحصلة</div>
+              </div>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>✅</div>
+                <div style={{ fontSize: '28px', fontWeight: 900, color: '#27ae60' }}>{stats.paidCount}</div>
+                <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عمليات الدفع الناجحة</div>
+              </div>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>⏳</div>
+                <div style={{ fontSize: '28px', fontWeight: 900, color: '#e67e22' }}>{stats.pendingCount}</div>
+                <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>الفواتير/الطلبات المعلقة</div>
+              </div>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '24px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📚</div>
+                <div style={{ fontSize: '28px', fontWeight: 900, color: '#8B1A3A' }}>{stats.coursesCount}</div>
+                <div style={{ color: '#888', fontSize: '13px', fontWeight: 600, marginTop: '3px' }}>عدد الكورسات الكلي</div>
+              </div>
+            </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-          <Link href="/admin/courses">
-            <a style={{
-              display: 'block',
-              background: '#ffffff',
-              borderRadius: '18px',
-              padding: '28px',
-              textDecoration: 'none',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-              border: '1px solid rgba(27,43,107,0.06)',
-              transition: 'transform 0.3s'
-            }}>
-              <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
-              <h3 style={{ color: '#1B2B6B', fontWeight: 900, margin: '0 0 5px', fontSize: '18px' }}>
-                إدارة الكورسات
-              </h3>
-              <p style={{ color: '#888', fontSize: '13px', margin: 0, fontWeight: 600 }}>
-                عرض تعديل وحذف الكورسات الموجودة
-              </p>
-              <div style={{
-                marginTop: '15px',
-                padding: '10px 20px',
-                background: '#1B2B6B',
-                color: '#fff',
-                borderRadius: '50px',
-                fontSize: '13px',
-                fontWeight: 800,
-                textAlign: 'center',
-                display: 'inline-block'
-              }}>
-                افتح ←
-              </div>
-            </a>
-          </Link>
-          <Link href="/admin/courses/new">
-            <a style={{
-              display: 'block',
-              background: '#ffffff',
-              borderRadius: '18px',
-              padding: '28px',
-              textDecoration: 'none',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-              border: '1px solid rgba(139,26,58,0.1)',
-              transition: 'transform 0.3s'
-            }}>
-              <div style={{ fontSize: '36px', marginBottom: '12px' }}>➕</div>
-              <h3 style={{ color: '#8B1A3A', fontWeight: 900, margin: '0 0 5px', fontSize: '18px' }}>
-                إضافة كورس جديد
-              </h3>
-              <p style={{ color: '#888', fontSize: '13px', margin: 0, fontWeight: 600 }}>
-                إنشاء كورس جديد ببيانه وسعره
-              </p>
-              <div style={{
-                marginTop: '15px',
-                padding: '10px 20px',
-                background: '#8B1A3A',
-                color: '#fff',
-                borderRadius: '50px',
-                fontSize: '13px',
-                fontWeight: 800,
-                textAlign: 'center',
-                display: 'inline-block'
-              }}>
-                ابدأ ←
-              </div>
-            </a>
-          </Link>
-        </div>
+            {/* Quick Actions Grid */}
+            <h2 style={{ color: '#1B2B6B', fontWeight: 900, fontSize: '20px', marginBottom: '20px' }}>الوصول السريع للمهام ⚡</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+              <Link href="/admin/payments" style={{
+                display: 'block',
+                background: '#ffffff',
+                borderRadius: '18px',
+                padding: '28px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)',
+                transition: 'transform 0.2s',
+                cursor: 'pointer'
+              }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
+                <div style={{ fontSize: '36px', marginBottom: '12px' }}>📊</div>
+                <h3 style={{ color: '#1B2B6B', fontWeight: 900, margin: '0 0 5px', fontSize: '18px' }}>
+                  سجل المدفوعات والفواتير
+                </h3>
+                <p style={{ color: '#888', fontSize: '13px', margin: 0, fontWeight: 600 }}>
+                  متابعة الطلاب الذين دفعوا، تصفح الفواتير، وتحميلها بصيغة PDF.
+                </p>
+                <div style={{
+                  marginTop: '15px',
+                  padding: '10px 20px',
+                  background: '#1B2B6B',
+                  color: '#fff',
+                  borderRadius: '50px',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  display: 'inline-block'
+                }}>
+                  افتح السجل ←
+                </div>
+              </Link>
+
+              <Link href="/admin/payments/links" style={{
+                display: 'block',
+                background: '#ffffff',
+                borderRadius: '18px',
+                padding: '28px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)',
+                transition: 'transform 0.2s',
+                cursor: 'pointer'
+              }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
+                <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔗</div>
+                <h3 style={{ color: '#8B1A3A', fontWeight: 900, margin: '0 0 5px', fontSize: '18px' }}>
+                  إنشاء رابط دفع مخصص
+                </h3>
+                <p style={{ color: '#888', fontSize: '13px', margin: 0, fontWeight: 600 }}>
+                  توليد رابط دفع بمبلغ مخصص وإرساله للطالب عبر واتساب فوراً.
+                </p>
+                <div style={{
+                  marginTop: '15px',
+                  padding: '10px 20px',
+                  background: '#8B1A3A',
+                  color: '#fff',
+                  borderRadius: '50px',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  display: 'inline-block'
+                }}>
+                  إنشاء رابط جديد ←
+                </div>
+              </Link>
+
+              <Link href="/admin/courses" style={{
+                display: 'block',
+                background: '#ffffff',
+                borderRadius: '18px',
+                padding: '28px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)',
+                transition: 'transform 0.2s',
+                cursor: 'pointer'
+              }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
+                <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
+                <h3 style={{ color: '#1B2B6B', fontWeight: 900, margin: '0 0 5px', fontSize: '18px' }}>
+                  إدارة الكورسات (المنتجات)
+                </h3>
+                <p style={{ color: '#888', fontSize: '13px', margin: 0, fontWeight: 600 }}>
+                  عرض، تعديل، وحذف الكورسات والمواد المتاحة في المنصة حالياً.
+                </p>
+                <div style={{
+                  marginTop: '15px',
+                  padding: '10px 20px',
+                  background: '#1B2B6B',
+                  color: '#fff',
+                  borderRadius: '50px',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  display: 'inline-block'
+                }}>
+                  إدارة المنتجات ←
+                </div>
+              </Link>
+
+              <Link href="/admin/courses/new" style={{
+                display: 'block',
+                background: '#ffffff',
+                borderRadius: '18px',
+                padding: '28px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(27,43,107,0.06)',
+                transition: 'transform 0.2s',
+                cursor: 'pointer'
+              }} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'none'}>
+                <div style={{ fontSize: '36px', marginBottom: '12px' }}>➕</div>
+                <h3 style={{ color: '#8B1A3A', fontWeight: 900, margin: '0 0 5px', fontSize: '18px' }}>
+                  إضافة كورس (منتج) جديد
+                </h3>
+                <p style={{ color: '#888', fontSize: '13px', margin: 0, fontWeight: 600 }}>
+                  إدخال كورس جديد وتحديد سعره والمادة الملحقة به والصف الدراسي.
+                </p>
+                <div style={{
+                  marginTop: '15px',
+                  padding: '10px 20px',
+                  background: '#8B1A3A',
+                  color: '#fff',
+                  borderRadius: '50px',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  display: 'inline-block'
+                }}>
+                  أضف كورس جديد ←
+                </div>
+              </Link>
+            </div>
+          </>
+        )}
       </main>
     </div>
   )

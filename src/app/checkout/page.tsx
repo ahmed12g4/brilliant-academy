@@ -41,10 +41,11 @@ function CheckoutContent() {
     }
   }, [courseId]);
 
-  const finalPrice = courseId ? coursePrice : price?.aed || 0;
-  const finalName = courseId ? courseName : (packageId ? { one: "حصة واحدة", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" }[packageId] || "الباقة" : "الباقة");
+  const customPrice = parseFloat(searchParams.get("price") || "0");
+  const finalPrice = courseId ? coursePrice : (packageId === "custom" && customPrice ? customPrice : (price?.aed || 0));
+  const finalName = courseId ? courseName : (packageId === "custom" ? (subject || "رابط دفع مخصص") : (packageId ? { one: "حصة واحدة", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" }[packageId] || "الباقة" : "الباقة"));
 
-  const packageNames: Record<string, string> = { one: "حصة واحدة", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" };
+  const packageNames: Record<string, string> = { one: "حصة واحدة", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة", custom: subject || "رابط دفع مخصص" };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
