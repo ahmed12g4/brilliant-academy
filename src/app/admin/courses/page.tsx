@@ -5,12 +5,6 @@ import Link from 'next/link'
 export default function AdminCourses() {
   const [courses, setCourses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [filterSubject, setFilterSubject] = useState('all')
-  const [filterGrade, setFilterGrade] = useState('all')
-
-  const subjects = ['لغة عربية', 'لغة انجليزية', 'رياضيات', 'علوم', 'قرآن كـريم', 'تربية إسلامية', 'حساب ذهني', 'اجتماعيات', 'فيزياء', 'كيما', 'أحياء', 'لغة فرنسية', 'جيولوجيا', 'جغرافي', 'تاريخ']
-  const gradeLabels = { 'group_1_5': 'ابتدائي', 'group_6_9': 'متوسط', 'group_10_11': 'ثانوي', 'grade_12': 'ثانوي عام', 'mental_math': 'حساب ذهني' }
-  const gradeKeys = ['group_1_5', 'group_6_9', 'group_10_11', 'grade_12', 'mental_math']
 
   useEffect(() => {
     async function fetchCourses() {
@@ -23,12 +17,6 @@ export default function AdminCourses() {
     }
     fetchCourses()
   }, [])
-
-  const filteredCourses = courses.filter((c: any) => {
-    if (filterSubject !== 'all' && c.subject !== filterSubject) return false
-    if (filterGrade !== 'all' && c.gradeLevel !== filterGrade) return false
-    return true
-  })
 
   const handleDelete = async (slug: string) => {
     if (!confirm('هل أنت متأكد من حذف هذا الكورس؟')) return
@@ -124,54 +112,11 @@ export default function AdminCourses() {
           </Link>
         </div>
 
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexWrap: 'wrap' }}>
-          <select
-            value={filterSubject}
-            onChange={(e) => setFilterSubject(e.target.value)}
-            style={{
-              padding: '12px 16px',
-              borderRadius: '12px',
-              border: '2px solid #eee',
-              fontSize: '14px',
-              fontWeight: 600,
-              color: '#1B2B6B',
-              fontFamily: 'Cairo',
-              background: '#fff',
-              minWidth: '180px'
-            }}
-          >
-            <option value="all">جميع المواد</option>
-            {subjects.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-          <select
-            value={filterGrade}
-            onChange={(e) => setFilterGrade(e.target.value)}
-            style={{
-              padding: '12px 16px',
-              borderRadius: '12px',
-              border: '2px solid #eee',
-              fontSize: '14px',
-              fontWeight: 600,
-              color: '#1B2B6B',
-              fontFamily: 'Cairo',
-              background: '#fff',
-              minWidth: '180px'
-            }}
-          >
-            <option value="all">جميع المراحل</option>
-            {gradeKeys.map((g: string) => (
-              <option key={g} value={g}>{gradeLabels[g as keyof typeof gradeLabels]}</option>
-            ))}
-          </select>
-        </div>
-
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px' }}>
             <p style={{ color: '#999', fontSize: '16px', fontWeight: 600 }}>⏳ جاري التحميل...</p>
           </div>
-        ) : filteredCourses.length === 0 ? (
+        ) : courses.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', background: '#fafafa', borderRadius: '16px' }}>
             <div style={{ fontSize: '50px', marginBottom: '10px' }}>📚</div>
             <p style={{ color: '#888', fontSize: '16px', fontWeight: 700, marginBottom: '15px' }}>لا توجد كورسات</p>
@@ -193,7 +138,7 @@ export default function AdminCourses() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px' }}>
-            {filteredCourses.map((c: any) => (
+            {courses.map((c: any) => (
               <div key={c.id} style={{
                 background: '#ffffff',
                 borderRadius: '18px',
@@ -215,7 +160,7 @@ export default function AdminCourses() {
                       fontSize: '11px',
                       fontWeight: 700
                     }}>
-                      {subjects.includes(c.subject || '') ? c.subject : 'عام'}
+                      {c.subject || 'عام'}
                     </span>
                     <span style={{
                       background: 'rgba(255,255,255,0.2)',
@@ -225,7 +170,7 @@ export default function AdminCourses() {
                       fontSize: '11px',
                       fontWeight: 700
                     }}>
-                      {gradeLabels[c.gradeLevel as keyof typeof gradeLabels] || c.gradeLevel}
+                      {c.gradeLevel || 'عام'}
                     </span>
                   </div>
                 </div>
