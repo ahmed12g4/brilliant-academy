@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PRICES, COUNTRY_NAMES, getGradeGroup, getGradeName, isMentalMath, type Country } from "@/lib/prices";
@@ -17,6 +17,26 @@ function PricingContent() {
   const grade = parseInt(searchParams.get("grade") || "1");
   const subject = searchParams.get("subject") || "";
   const country = (searchParams.get("country") || "Kuwait") as Country;
+  const [adminCourses, setAdminCourses] = useState<any[]>([]);
+  const [adminLoading, setAdminLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await fetch('/api/courses');
+        const data = await res.json();
+        const filtered = data.filter((c: any) => {
+          if (c.gradeLevel !== grade) return false;
+          if (c.country !== country) return false;
+          if (c.subject !== subject) return false;
+          return true;
+        });
+        setAdminCourses(filtered);
+      } catch {}
+      setAdminLoading(false);
+    }
+    fetchCourses();
+  }, [grade, country, subject]);
 
   const mental = isMentalMath(subject);
   const group = mental ? "mental_math" : getGradeGroup(grade);
@@ -326,6 +346,37 @@ function PricingContent() {
               })
             )}
           </div>
+
+          {/* Admin-added courses */}
+          {adminLoading ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <p style={{ color: '#999', fontSize: '14px' }}>⏳ جاري التحميل...</p>
+            </div>
+          ) : adminCourses.length > 0 ? (
+            <>
+              <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '20px', fontSize: '22px', textAlign: 'center' }}>
+                📚 كورسات إضافية
+              </h2>
+              <div className="ba-pricing-grid">
+                {adminCourses.map((c: any) => (
+                  <div className="ba-price-card" key={c.id}>
+                    {c.imageUrl && (
+                      <div style={{ width: '100%', height: '120px', borderRadius: '12px', overflow: 'hidden', marginBottom: '10px' }}>
+                        <img src={c.imageUrl} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    )}
+                    <h3 className="ba-package-name">{c.name}</h3>
+                    <p className="ba-package-desc">{c.description || ''}</p>
+                    <div className="ba-price-amount">
+                      <span className="ba-price-value">{c.price}</span>
+                      <span className="ba-price-currency">درهم</span>
+                    </div>
+                    <Link href={`/checkout?course=${c.id}&grade=${grade}&country=${country}&subject=${encodeURIComponent(subject)}`} className="ba-subscribe-btn">اشترك الآن</Link>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       </section>
     </>

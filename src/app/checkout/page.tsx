@@ -1,6 +1,7 @@
 "use client";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PRICES, getGradeGroup, isMentalMath } from "@/lib/prices";
@@ -8,6 +9,7 @@ import { PRICES, getGradeGroup, isMentalMath } from "@/lib/prices";
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const packageId = searchParams.get("package") || "";
+  const courseId = searchParams.get("course") || "";
   const grade = parseInt(searchParams.get("grade") || "1");
   const subject = searchParams.get("subject") || "";
   const country = searchParams.get("country") || "Kuwait";
@@ -17,11 +19,30 @@ function CheckoutContent() {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [coursePrice, setCoursePrice] = useState(0);
+  const [courseName, setCourseName] = useState("");
 
   const mental = isMentalMath(subject);
   const group = mental ? "mental_math" : getGradeGroup(grade);
   const prices: Record<string, { aed: number; kwd: number; qar: number; sar: number }> = PRICES[group as keyof typeof PRICES] as any;
   const price = prices?.[packageId] || { aed: 0, kwd: 0, qar: 0, sar: 0 };
+
+  useEffect(() => {
+    if (courseId) {
+      fetch(`/api/courses?slug=${courseId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data[0]) {
+            setCoursePrice(data[0].price);
+            setCourseName(data[0].name);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [courseId]);
+
+  const finalPrice = courseId ? coursePrice : price?.aed || 0;
+  const finalName = courseId ? courseName : (packageId ? { one: "حصة واحدة", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" }[packageId] || "الباقة" : "الباقة");
 
   const packageNames: Record<string, string> = { one: "حصة واحدة", four: "باقة 4 حصص", eight: "باقة 8 حصص", twelve: "باقة 12 حصة" };
 
@@ -34,7 +55,7 @@ function CheckoutContent() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, packageId, grade, subject, country, priceAed: price?.aed || 0 }),
+        body: JSON.stringify({ name, email, phone, packageId, courseId, grade, subject, country, priceAed: finalPrice }),
       });
       const data = await res.json();
       if (data.url) {
@@ -79,8 +100,8 @@ function CheckoutContent() {
             <p>يرجى تعبئة البيانات بدقة للتواصل معك</p>
           </div>
           <div className="ba-package-summary">
-            <div>{packageNames[packageId] || "الباقة"} - {subject}</div>
-            <div className="ba-price">{price?.aed || "--"} درهم</div>
+            <div>{finalName} - {subject}</div>
+            <div className="ba-price">{finalPrice} درهم</div>
           </div>
           {error && <div className="ba-error">{error}</div>}
           <form onSubmit={handleSubmit}>
