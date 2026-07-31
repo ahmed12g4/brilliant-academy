@@ -3,179 +3,165 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-const categories = [
-  { id: 'primary', name: 'ابتدائي', grades: 'الصف 1-6' },
-  { id: 'middle', name: 'متوسط', grades: 'الصف 7-9' },
-  { id: 'secondary', name: 'ثانوي', grades: 'الصف 10-12' },
-  { id: 'mental', name: 'حساب ذهني', grades: 'مستويات متعددة' },
+const subjects = [
+  { id: 'arabic', name: 'لغة عربية', icon: '📖', color: '#8B1A3A' },
+  { id: 'english', name: 'لغة انجليزية', icon: '🔤', color: '#1B2B6B' },
+  { id: 'math', name: 'رياضيات', icon: '🔢', color: '#2a7a4b' },
+  { id: 'science', name: 'علوم', icon: '🔬', color: '#8B6914' },
+  { id: 'quran', name: 'قرآن كـريم', icon: '📜', color: '#2a5a8c' },
+  { id: 'islamic', name: 'تربية إسلامية', icon: '🕌', color: '#6a3d8c' },
+  { id: 'mental', name: 'حساب ذهني', icon: '🧠', color: '#c0392b' },
+  { id: 'social', name: 'اجتماعيات', icon: '🌍', color: '#5a7a3c' },
+  { id: 'physics', name: 'فيزياء', icon: '⚡', color: '#1B2B6B' },
+  { id: 'chemistry', name: 'كيما', icon: '🧪', color: '#8B6914' },
+  { id: 'biology', name: 'أحياء', icon: '🧬', color: '#2a7a4b' },
+  { id: 'french', name: 'لغة فرنسية', icon: '🇫🇷', color: '#1B2B6B' },
+]
+
+const gradeLevels = [
+  { id: 'primary', name: 'ابتدائي', grades: '1-6' },
+  { id: 'middle', name: 'متوسط', grades: '7-9' },
+  { id: 'secondary', name: 'ثانوي', grades: '10-12' },
 ]
 
 export default function NewCourse() {
   const [step, setStep] = useState(1)
-  const [category, setCategory] = useState('')
+  const [selectedSubject, setSelectedSubject] = useState('')
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState('')
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
-  const [slug, setSlug] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleCategoryNext = () => {
-    if (!category) return
+  const handleSubjectSelect = (subjectId: string) => {
+    setSelectedSubject(subjectId)
     setStep(2)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !price || !slug) return
+    if (!name || !price || !selectedSubject) return
     setLoading(true)
+    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now()
     await fetch('/api/courses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, price: parseFloat(price), description, slug })
+      body: JSON.stringify({ name, price: parseFloat(price), description, slug, imageUrl, subject: selectedSubject, gradeLevel: selectedGradeLevel })
     })
     router.push('/admin/courses')
   }
+
+  const selectedSubjectData = subjects.find((s) => s.id === selectedSubject)
 
   return (
     <div style={{
       fontFamily: 'Cairo',
       direction: 'rtl',
       minHeight: '100vh',
-      background: '#f5f5f5'
+      background: '#f5f5f5',
+      padding: '40px 5vw'
     }}>
-      <header style={{
-        background: '#ffffff',
-        borderBottom: '3px solid #8B1A3A',
-        padding: '15px 40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.06)'
+      <div style={{
+        maxWidth: '900px',
+        margin: '0 auto',
+        background: '#fff',
+        borderRadius: '24px',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.06)',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img
-            src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
-            alt="Logo"
-            style={{ height: '40px', width: 'auto' }}
-          />
-          <span style={{ color: '#1B2B6B', fontWeight: 800, fontSize: '16px' }}>
-            لوحة التحكم
-          </span>
-        </div>
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault()
-            document.cookie = 'admin_pass=; path=/; max-age=0'
-            window.location.href = '/admin/login'
-          }}
-        >
-          <button
-            type="submit"
-            style={{
-              padding: '8px 20px',
-              background: '#8B1A3A',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '50px',
-              fontSize: '13px',
-              fontWeight: 800,
-              cursor: 'pointer'
-            }}
-          >
-            خروج
-          </button>
-        </form>
-      </header>
-      <main style={{ padding: '40px 5vw' }}>
         <div style={{
-          maxWidth: '700px',
-          margin: '0 auto',
-          background: '#fff',
-          borderRadius: '24px',
-          padding: '40px',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.06)'
+          background: 'linear-gradient(135deg, #1B2B6B 0%, #2a3a8c 50%, #8B1A3A 100%)',
+          padding: '25px 30px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
-            <Link href="/admin/courses">
-              <a style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '14px', fontWeight: 700 }}>
-                ← رجوع
-              </a>
-            </Link>
-            <span style={{ color: '#ccc', fontSize: '14px' }}>|</span>
-            <span style={{ color: '#888', fontSize: '14px' }}>
-              خطوة {step} من 2
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img
+              src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
+              alt="Logo"
+              style={{ height: '38px', width: 'auto' }}
+            />
+            <span style={{ color: '#ffffff', fontWeight: 800, fontSize: '15px' }}>إضافة كورس جديد</span>
+          </div>
+          <Link href="/admin/courses">
+            <a style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}>
+              ← رجوع للكورسات
+            </a>
+          </Link>
+        </div>
+
+        <div style={{ padding: '30px' }}>
+          {/* Step Indicator */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
+            {[1, 2].map((s) => (
+              <div key={s} style={{
+                flex: 1,
+                height: '6px',
+                borderRadius: '3px',
+                background: s <= step ? '#8B1A3A' : '#eee',
+                transition: 'background 0.3s'
+              }} />
+            ))}
           </div>
 
           {step === 1 && (
             <>
-              <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '8px', fontSize: '22px' }}>
-                اختر تصنيف الكورس
+              <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '5px', fontSize: '20px' }}>
+                اختر المادة
               </h2>
-              <p style={{ color: '#666', fontSize: '14px', marginBottom: '25px' }}>
-                اختار التصنيف اللي يناسب الكورس الجديد
+              <p style={{ color: '#666', fontSize: '14px', marginBottom: '20px', fontWeight: 600 }}>
+                اختار المادة التعليمية من القائمة
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
-                {categories.map((cat) => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
+                {subjects.map((subj) => (
                   <button
-                    key={cat.id}
-                    onClick={() => setCategory(cat.id)}
+                    key={subj.id}
+                    onClick={() => handleSubjectSelect(subj.id)}
                     style={{
-                      padding: '24px',
-                      background: category === cat.id ? '#1B2B6B' : '#fafafa',
-                      color: category === cat.id ? '#fff' : '#1B2B6B',
-                      border: `2px solid ${category === cat.id ? '#1B2B6B' : '#eee'}`,
-                      borderRadius: '16px',
+                      padding: '16px 10px',
+                      background: selectedSubject === subj.id ? subj.color : '#fafafa',
+                      color: selectedSubject === subj.id ? '#fff' : '#333',
+                      border: `2px solid ${selectedSubject === subj.id ? subj.color : '#eee'}`,
+                      borderRadius: '12px',
                       cursor: 'pointer',
                       textAlign: 'center',
                       transition: 'all 0.3s',
                       fontFamily: 'Cairo'
                     }}
                   >
-                    <div style={{ fontWeight: 900, fontSize: '18px', marginBottom: '5px' }}>
-                      {cat.name}
-                    </div>
-                    <div style={{ fontSize: '12px', opacity: 0.7 }}>
-                      {cat.grades}
-                    </div>
+                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>{subj.icon}</div>
+                    <div style={{ fontWeight: 700, fontSize: '12px' }}>{subj.name}</div>
                   </button>
                 ))}
-              </div>
-              <div style={{ marginTop: '25px', textAlign: 'left' }}>
-                <button
-                  onClick={handleCategoryNext}
-                  disabled={!category}
-                  style={{
-                    padding: '14px 36px',
-                    background: category ? '#8B1A3A' : '#ccc',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '50px',
-                    fontSize: '16px',
-                    fontWeight: 800,
-                    cursor: category ? 'pointer' : 'not-allowed',
-                    fontFamily: 'Cairo'
-                  }}
-                >
-                  التالي ←
-                </button>
               </div>
             </>
           )}
 
-          {step === 2 && (
+          {step === 2 && selectedSubjectData && (
             <>
-              <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '8px', fontSize: '22px' }}>
-                تفاصيل الكورس
-              </h2>
-              <p style={{ color: '#666', fontSize: '14px', marginBottom: '25px' }}>
-                املأ البيانات المطلوبة
-              </p>
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                <span style={{ fontSize: '24px' }}>{selectedSubjectData.icon}</span>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>
-                    اسم الكورس
+                  <span style={{
+                    background: selectedSubjectData.color,
+                    color: '#fff',
+                    padding: '4px 14px',
+                    borderRadius: '50px',
+                    fontSize: '12px',
+                    fontWeight: 800
+                  }}>
+                    {selectedSubjectData.name}
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>
+                    عنوان الكورس
                   </label>
                   <input
                     type="text"
@@ -184,84 +170,106 @@ export default function NewCourse() {
                     required
                     placeholder="مثال: لغة عربية - الصف السادس"
                     style={{
-                      width: '100%', padding: '14px 16px', borderRadius: '12px',
-                      border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo',
-                      color: '#1B2B6B'
+                      width: '100%', padding: '13px 14px', borderRadius: '12px',
+                      border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo',
+                      color: '#1B2B6B', fontWeight: 600
                     }}
                   />
                 </div>
+
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>
-                    السعر (درهم)
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>
+                    السعر - درهم إماراتي (AED)
                   </label>
                   <input
                     type="number"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     required
-                    min="0"
+                    min="1"
                     placeholder="مثال: 150"
                     style={{
-                      width: '100%', padding: '14px 16px', borderRadius: '12px',
-                      border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo',
-                      color: '#1B2B6B'
+                      width: '100%', padding: '13px 14px', borderRadius: '12px',
+                      border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo',
+                      color: '#1B2B6B', fontWeight: 600
                     }}
                   />
                 </div>
+
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>
-                    الرابط (slug)
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>
+                    رابط صورة الكورس (URL)
                   </label>
                   <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    required
-                    placeholder="مثال: arabic-grade6"
+                    type="url"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    placeholder="https://example.com/course-image.jpg"
                     style={{
-                      width: '100%', padding: '14px 16px', borderRadius: '12px',
-                      border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo',
-                      color: '#1B2B6B'
+                      width: '100%', padding: '13px 14px', borderRadius: '12px',
+                      border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo',
+                      color: '#1B2B6B', fontWeight: 600
                     }}
                   />
                 </div>
+
                 <div>
-                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>
-                    الوصف (اختياري)
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>
+                    الوصف
                   </label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
+                    placeholder="وصف الكورس..."
                     style={{
-                      width: '100%', padding: '14px 16px', borderRadius: '12px',
-                      border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo',
+                      width: '100%', padding: '13px 14px', borderRadius: '12px',
+                      border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo',
                       color: '#1B2B6B', resize: 'vertical'
                     }}
                   />
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    padding: '16px',
-                    background: '#8B1A3A',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '50px',
-                    fontSize: '17px',
-                    fontWeight: 800,
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    fontFamily: 'Cairo'
-                  }}
-                >
-                  {loading ? 'جاري الحفظ...' : '💾 حفظ الكورس'}
-                </button>
+
+                <div style={{ marginTop: '5px' }}>
+                  <button
+                    type="submit"
+                    disabled={loading || !name || !price}
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: loading || !name || !price ? '#ccc' : '#8B1A3A',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '50px',
+                      fontSize: '17px',
+                      fontWeight: 800,
+                      cursor: loading || !name || !price ? 'not-allowed' : 'pointer',
+                      fontFamily: 'Cairo'
+                    }}
+                  >
+                    {loading ? '⏳ جاري الحفظ...' : '💾 حفظ الكورس'}
+                  </button>
+                </div>
               </form>
+
+              {name && price && (
+                <div style={{ marginTop: '20px', padding: '15px', background: '#f0f8ff', borderRadius: '12px', border: '1px solid #d0e0ff' }}>
+                  <p style={{ color: '#1B2B6B', fontSize: '13px', fontWeight: 700, marginBottom: '3px' }}>رابط الكورس:</p>
+                  <code style={{
+                    fontSize: '13px',
+                    color: '#8B1A3A',
+                    fontWeight: 700,
+                    direction: 'ltr',
+                    fontFamily: 'monospace'
+                  }}>
+                    /course/{name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}
+                  </code>
+                </div>
+              )}
             </>
           )}
         </div>
-      </main>
+      </div>
     </div>
   )
 }

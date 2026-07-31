@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { name, price, description, slug } = body
+  const { name, price, description, slug, imageUrl, subject, gradeLevel } = body
 
   if (!name || !price || !slug) {
     return NextResponse.json({ error: 'البيانات ناقصة' }, { status: 400 })
@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
     name,
     price,
     description,
+    imageUrl,
+    subject,
+    gradeLevel,
     slug,
     createdAt: now
   }
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   const body = await req.json()
-  const { name, price, description, slug } = body
+  const { name, price, description, slug, imageUrl, subject } = body
 
   if (!name || !price || !slug) {
     return NextResponse.json({ error: 'البيانات ناقصة' }, { status: 400 })
@@ -53,13 +56,17 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'الكورس غير موجود' }, { status: 404 })
   }
 
+  const old = JSON.parse(existing)
   const course = {
     id: slug,
     name,
     price,
     description,
+    imageUrl: imageUrl || old.imageUrl,
+    subject: subject || old.subject,
+    gradeLevel: old.gradeLevel,
     slug,
-    createdAt: JSON.parse(existing).createdAt,
+    createdAt: old.createdAt,
     updatedAt: new Date().toISOString()
   }
 

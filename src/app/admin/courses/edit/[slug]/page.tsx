@@ -7,6 +7,8 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
+  const [subject, setSubject] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -22,6 +24,8 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
           setName(course.name)
           setPrice(String(course.price))
           setDescription(course.description || '')
+          setImageUrl(course.imageUrl || '')
+          setSubject(course.subject || '')
         }
       } catch {}
       setLoading(false)
@@ -36,7 +40,7 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
     const res = await fetch('/api/courses', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, price: parseFloat(price), description, slug: params.slug })
+      body: JSON.stringify({ name, price: parseFloat(price), description, slug: params.slug, imageUrl, subject })
     })
     const data = await res.json()
     if (data.error) {
@@ -62,49 +66,51 @@ export default function EditCourse({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div style={{ fontFamily: 'Cairo', direction: 'rtl', minHeight: '100vh', background: '#f5f5f5' }}>
-      <header style={{ background: '#ffffff', borderBottom: '3px solid #8B1A3A', padding: '15px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png" alt="Logo" style={{ height: '40px', width: 'auto' }} />
-          <span style={{ color: '#1B2B6B', fontWeight: 800, fontSize: '16px' }}>لوحة التحكم</span>
+    <div style={{ fontFamily: 'Cairo', direction: 'rtl', minHeight: '100vh', background: '#f5f5f5', padding: '40px 5vw' }}>
+      <div style={{ maxWidth: '700px', margin: '0 auto', background: '#fff', borderRadius: '24px', boxShadow: '0 10px 40px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+        <div style={{ background: 'linear-gradient(135deg, #1B2B6B 0%, #2a3a8c 50%, #8B1A3A 100%)', padding: '25px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png" alt="Logo" style={{ height: '38px', width: 'auto' }} />
+            <span style={{ color: '#fff', fontWeight: 800, fontSize: '15px' }}>تعديل الكورس</span>
+          </div>
+          <form onSubmit={async (e) => { e.preventDefault(); document.cookie = 'admin_pass=; path=/; max-age=0'; window.location.href = '/admin/login' }}>
+            <button type="submit" style={{ padding: '8px 18px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '2px solid rgba(255,255,255,0.3)', borderRadius: '50px', fontSize: '12px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Cairo' }}>خروج</button>
+          </form>
         </div>
-        <form onSubmit={async (e) => { e.preventDefault(); document.cookie = 'admin_pass=; path=/; max-age=0'; window.location.href = '/admin/login' }}>
-          <button type="submit" style={{ padding: '8px 20px', background: '#8B1A3A', color: '#fff', border: 'none', borderRadius: '50px', fontSize: '13px', fontWeight: 800, cursor: 'pointer' }}>خروج</button>
-        </form>
-      </header>
-      <main style={{ padding: '40px 5vw' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', background: '#fff', borderRadius: '24px', padding: '40px', boxShadow: '0 10px 40px rgba(0,0,0,0.06)' }}>
+        <div style={{ padding: '30px' }}>
           <Link href="/admin/courses">
-            <a style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '14px', fontWeight: 700, display: 'inline-block', marginBottom: '20px' }}>← رجوع</a>
+            <a style={{ color: '#1B2B6B', textDecoration: 'none', fontSize: '13px', fontWeight: 700, display: 'inline-block', marginBottom: '20px' }}>← رجوع</a>
           </Link>
-          <h1 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '8px', fontSize: '22px' }}>تعديل الكورس</h1>
-          <p style={{ color: '#666', fontSize: '14px', marginBottom: '25px' }}>عدّل البيانات المطلوبة</p>
-          {error && <p style={{ color: '#d32f2f', marginBottom: '15px', fontSize: '14px' }}>{error}</p>}
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <h2 style={{ color: '#1B2B6B', fontWeight: 900, marginBottom: '5px', fontSize: '20px' }}>تعديل الكورس</h2>
+          <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>عدّل البيانات المطلوبة</p>
+          {error && <p style={{ color: '#d32f2f', marginBottom: '12px', fontSize: '13px', fontWeight: 600 }}>{error}</p>}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>اسم الكورس</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo', color: '#1B2B6B' }} />
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>عنوان الكورس</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }} />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>السعر (درهم)</label>
-              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo', color: '#1B2B6B' }} />
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>السعر (درهم AED)</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required min="1" style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }} />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 700, color: '#1B2B6B', fontSize: '14px' }}>الوصف (اختياري)</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '2px solid #eee', fontSize: '15px', fontFamily: 'Cairo', color: '#1B2B6B', resize: 'vertical' }} />
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>رابط الصورة (اختياري)</label>
+              <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://example.com/image.jpg" style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', fontWeight: 600 }} />
             </div>
-            <button type="submit" disabled={saving} style={{ padding: '16px', background: '#1B2B6B', color: '#fff', border: 'none', borderRadius: '50px', fontSize: '17px', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Cairo' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 700, color: '#1B2B6B', fontSize: '13px' }}>الوصف (اختياري)</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '2px solid #eee', fontSize: '14px', fontFamily: 'Cairo', color: '#1B2B6B', resize: 'vertical' }} />
+            </div>
+            <button type="submit" disabled={saving} style={{ padding: '14px', background: '#1B2B6B', color: '#fff', border: 'none', borderRadius: '50px', fontSize: '16px', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Cairo' }}>
               {saving ? 'جاري الحفظ...' : '💾 حفظ التعديلات'}
             </button>
           </form>
-          <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-            <p style={{ color: '#888', fontSize: '13px', marginBottom: '10px', fontWeight: 700 }}>⚠️ خطير: حذف الكورس</p>
-            <button onClick={handleDelete} style={{ padding: '10px 24px', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '50px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Cairo' }}>
-              🗑 حذف الكورس
-            </button>
+          <div style={{ marginTop: '25px', paddingTop: '18px', borderTop: '1px solid #eee' }}>
+            <p style={{ color: '#888', fontSize: '12px', fontWeight: 700, marginBottom: '8px' }}>⚠️ خطير: حذف الكورس</p>
+            <button onClick={handleDelete} style={{ padding: '10px 22px', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '50px', fontSize: '12px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Cairo' }}>🗑 حذف الكورس</button>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }
