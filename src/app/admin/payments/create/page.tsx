@@ -259,10 +259,6 @@ export default function CreatePaymentLinkPage() {
                 <option value="6">6 ساعات</option>
                 <option value="12">12 ساعة</option>
                 <option value="24">يوم واحد (24 ساعة)</option>
-                <option value="48">يومان (48 ساعة)</option>
-                <option value="72">3 أيام (72 ساعة)</option>
-                <option value="168">أسبوع واحد (168 ساعة)</option>
-                <option value="720">شهر واحد (720 ساعة)</option>
                 <option value="0">دائم (لا ينتهي)</option>
               </select>
             </div>

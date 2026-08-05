@@ -25,7 +25,7 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
 
 function calculateExpiresAt(hours: number): number | undefined {
   if (hours <= 0) return undefined
-  const maxHours = 6 * 24 + 23
+  const maxHours = 23
   const cappedHours = Math.min(hours, maxHours)
   return Math.floor(Date.now() / 1000) + (cappedHours * 60 * 60)
 }
