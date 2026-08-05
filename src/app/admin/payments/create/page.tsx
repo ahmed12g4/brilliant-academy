@@ -605,7 +605,7 @@ const testBtn = {
   fontWeight: 700,
   fontFamily: '"Cairo", system-ui, sans-serif',
   textDecoration: 'none',
-  textAlign: 'center',
+  textAlign: 'center' as const,
   transition: 'transform 0.15s, box-shadow 0.15s'
 }
 
