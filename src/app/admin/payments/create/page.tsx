@@ -27,6 +27,17 @@ export default function CreatePaymentLinkPage() {
   } | null>(null)
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' }>({
+    visible: false,
+    message: '',
+    type: 'success'
+  })
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setToast({ visible: true, message: 'تم نسخ الرابط!', type: 'success' })
+    setTimeout(() => setToast(prev => ({ ...prev, visible: false })), 2500)
+  }
 
   const validateForm = () => {
     const errors: Record<string, string> = {}
@@ -357,7 +368,7 @@ export default function CreatePaymentLinkPage() {
               </div>
               <div>
                 <h3 style={{ color: '#166534', fontWeight: 900, fontSize: '17px', margin: 0 }}>
-                  ✅ تم إنشاء رابط الدفع بنجاح!
+                  تم إنشاء رابط الدفع بنجاح!
                 </h3>
                 <p style={{ color: '#888', fontSize: '12px', margin: '2px 0 0', fontWeight: 500 }}>
                   رابط الدفع جاهز — انسخه وأرسله للطالب
@@ -373,7 +384,7 @@ export default function CreatePaymentLinkPage() {
               border: '2px solid #fde047',
               marginBottom: '16px',
               cursor: 'pointer'
-            }} onClick={() => { navigator.clipboard.writeText(result.checkout_url); alert('تم نسخ الرابط!') }}>
+            }} onClick={() => { copyToClipboard(result.checkout_url) }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -419,7 +430,7 @@ export default function CreatePaymentLinkPage() {
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button
-                onClick={() => { navigator.clipboard.writeText(result.checkout_url); alert('تم نسخ الرابط!') }}
+                onClick={() => { copyToClipboard(result.checkout_url) }}
                 style={{
                   flex: '1',
                   minWidth: '120px',
@@ -438,7 +449,11 @@ export default function CreatePaymentLinkPage() {
                   gap: '6px'
                 }}
               >
-                📋 نسخ الرابط
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="white" strokeWidth="1.5"/>
+                  <path d="M3 11V3a1.5 1.5 0 011.5-1.5H11" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                نسخ الرابط
               </button>
               <a
                 href={result.checkout_url}
@@ -464,7 +479,11 @@ export default function CreatePaymentLinkPage() {
                   gap: '6px'
                 }}
               >
-                🧪 اختبار الرابط
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 2L2 6h4M2 6v6a1 1 0 001 1h8a1 1 0 001-1V6h4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M6 14h4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                اختبار الرابط
               </a>
             </div>
 
@@ -494,7 +513,7 @@ export default function CreatePaymentLinkPage() {
               }}>
                 <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.3px' }}>الصلاحية</span>
                 <p style={{ margin: '4px 0 0', fontSize: '13px', fontWeight: 700, color: result.expires_at > 0 ? '#166534' : '#e11d48' }}>
-                  {result.expires_at > 0 ? formatExpiry(result.expires_in_hours) : 'دائم'}
+                  {formatExpiry(result.expires_in_hours)}
                 </p>
               </div>
               <div style={{
@@ -510,6 +529,42 @@ export default function CreatePaymentLinkPage() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Toast Notification */}
+        {toast.visible && (
+          <div style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '12px 24px',
+            background: toast.type === 'success' ? '#166534' : '#dc2626',
+            color: '#ffffff',
+            borderRadius: '12px',
+            fontSize: '14px',
+            fontWeight: 700,
+            fontFamily: 'Cairo',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            animation: 'toastIn 0.3s ease-out'
+          }}>
+            {toast.type === 'success' ? (
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" fill="white" opacity="0.2"/>
+                <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" fill="white" opacity="0.2"/>
+                <path d="M7 7l6 6M13 7l-6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            )}
+            {toast.message}
           </div>
         )}
 
@@ -529,6 +584,10 @@ export default function CreatePaymentLinkPage() {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         @media (min-width: 640px) {
           div[style*="gridTemplateColumns: '1fr'"] {
