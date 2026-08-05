@@ -404,7 +404,6 @@ const linkBoxStyle = {
   fontFamily: 'monospace',
   color: '#1B2B6B',
   border: '1px solid #e5e7eb',
-  borderRadius: '8px',
   cursor: 'pointer',
   userSelect: 'all' as const,
   transition: 'background 0.15s'
