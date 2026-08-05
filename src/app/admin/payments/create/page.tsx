@@ -26,6 +26,7 @@ export default function CreatePaymentLinkPage() {
     currency: string
   } | null>(null)
   const [error, setError] = useState('')
+  const [errorDetails, setErrorDetails] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' }>({
     visible: false,
@@ -71,11 +72,16 @@ export default function CreatePaymentLinkPage() {
 
       if (data.success) {
         setResult(data)
+        setError('')
+        setErrorDetails('')
+        copyToClipboard(data.checkout_url)
       } else {
         setError(data.error || 'حدث خطأ أثناء إنشاء رابط الدفع')
+        setErrorDetails(data.details || '')
       }
     } catch (err) {
       setError('حدث خطأ أثناء إنشاء رابط الدفع')
+      setErrorDetails(err instanceof Error ? err.message : 'خطأ غير معروف')
       console.error('Error:', err)
     } finally {
       setLoading(false)
@@ -332,6 +338,11 @@ export default function CreatePaymentLinkPage() {
             border: '1px solid #fecaca'
           }}>
             {error}
+            {errorDetails && (
+              <span style={{ display: 'block', marginTop: '4px', fontSize: '12px', fontWeight: 400, color: '#ef4444' }}>
+                {errorDetails}
+              </span>
+            )}
           </div>
         )}
 
