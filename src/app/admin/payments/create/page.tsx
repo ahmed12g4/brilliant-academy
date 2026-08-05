@@ -20,7 +20,7 @@ export default function CreatePaymentLinkPage() {
     product_id: string
     price_id: string
     expires_at: number
-    expires_in_hours: number
+    expires_in_hours: number | null
     course_name: string
     price_aed: number
     currency: string
@@ -78,7 +78,8 @@ export default function CreatePaymentLinkPage() {
     }
   }
 
-  const formatExpiry = (hours: number) => {
+  const formatExpiry = (hours: number | null) => {
+    if (hours === null) return 'دائم'
     if (hours < 24) return `${hours} ساعة`
     const days = Math.floor(hours / 24)
     const remainingHours = hours % 24

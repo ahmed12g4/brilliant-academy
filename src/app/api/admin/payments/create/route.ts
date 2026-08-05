@@ -23,8 +23,11 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
   return false
 }
 
-function calculateExpiresAt(hours: number): number {
-  return Math.floor(Date.now() / 1000) + (hours * 60 * 60)
+function calculateExpiresAt(hours: number): number | undefined {
+  if (hours <= 0) return undefined
+  const maxHours = 7 * 24
+  const cappedHours = Math.min(hours, maxHours)
+  return Math.floor(Date.now() / 1000) + (cappedHours * 60 * 60)
 }
 
 export async function POST(request: NextRequest) {
@@ -80,17 +83,17 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [{
-        price: stripePrice.id,
-        quantity: 1,
-      }],
-      mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&product=${stripeProduct.id}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/cancel`,
-      expires_at: Math.floor(Date.now() / 1000) + (expires_in_hours * 60 * 60),
-      metadata: {
+const checkoutSession = await stripe.checkout.sessions.create({
+       payment_method_types: ["card"],
+       line_items: [{
+         price: stripePrice.id,
+         quantity: 1,
+       }],
+       mode: "payment",
+       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&product=${stripeProduct.id}`,
+       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/cancel`,
+       ...(expiresAt ? { expires_at: expiresAt } : {}),
+       metadata: {
         course_name,
         price_aed,
         currency,
@@ -100,18 +103,18 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    return NextResponse.json({
-      success: true,
-      product_id: stripeProduct.id,
-      price_id: stripePrice.id,
-      checkout_url: checkoutSession.url,
-      expires_at: checkoutSession.expires_at,
-      expires_in_hours,
-      course_name,
-      price_aed,
-      currency,
-      message: 'تم إنشاء رابط الدفع بنجاح في Stripe'
-    })
+return NextResponse.json({
+       success: true,
+       product_id: stripeProduct.id,
+       price_id: stripePrice.id,
+       checkout_url: checkoutSession.url,
+       expires_at: checkoutSession.expires_at,
+       expires_in_hours: expires_in_hours === 0 ? null : expires_in_hours,
+       course_name,
+       price_aed,
+       currency,
+       message: 'تم إنشاء رابط الدفع بنجاح في Stripe'
+     })
   } catch (error) {
     console.error('خطأ في إنشاء رابط الدفع:', error)
     return NextResponse.json({ error: 'فشل في إنشاء رابط الدفع' }, { status: 500 })
