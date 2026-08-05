@@ -14,11 +14,31 @@ export default function CreatePaymentLinkPage() {
   })
   
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ checkout_url: string; product_id: string; price_id: string; expires_at: number; course_name: string; price_aed: number; currency: string } | null>(null)
+  const [result, setResult] = useState<{ 
+    checkout_url: string; 
+    product_id: string; 
+    price_id: string; 
+    expires_at: number; 
+    course_name: string; 
+    price_aed: number; 
+    currency: string 
+  } | null>(null)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {}
+    if (!formData.course_name.trim()) errors.course_name = 'اسم الكورس مطلوب'
+    if (!formData.price_aed || parseFloat(formData.price_aed) <= 0) errors.price_aed = 'السعر مطلوب ويجب أن يكون أكبر من صفر'
+    if (!formData.country) errors.country = 'اختر البلد'
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!validateForm()) return
+    
     setLoading(true)
     setError('')
     setResult(null)
@@ -27,7 +47,10 @@ export default function CreatePaymentLinkPage() {
       const response = await fetch('/api/admin/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          price_aed: parseFloat(formData.price_aed)
+        })
       })
       
       const data = await response.json()
@@ -45,238 +68,407 @@ export default function CreatePaymentLinkPage() {
     }
   }
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    alert('تم نسخ الرابط!')
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => ({ ...prev, [field]: '' }))
+    }
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: '#f8fafc',
-      fontFamily: 'Cairo',
-      direction: 'rtl'
-    }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
-        <div style={{ 
-          background: '#ffffff',
-          borderRadius: '24px',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-          padding: '40px'
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <img 
-              src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
-              alt="Brilliant Academy"
-              style={{ height: '50px', marginBottom: '15px' }}
-            />
-            <h1 style={{ color: '#1B2B6B', fontWeight: 900, fontSize: '24px', margin: 0 }}>
-              إنشاء رابط دفع جديد
-            </h1>
-            <p style={{ color: '#666', fontSize: '14px', margin: '10px 0 0' }}>
-              أنشئ رابط دفع لطلابك - سيتم إنشاء منتج وسعر دائمين في شريطـStripe
-            </p>
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <div style={headerStyle}>
+          <img src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png" alt="Brilliant Academy" style={logoStyle} />
+          <h1 style={titleStyle}>إنشاء رابط دفع جديد</h1>
+          <p style={subtitleStyle}>أنشئ رابط دفع لطلابك — سيتم إنشاء منتج وسعر دائمين في Stripe</p>
+        </div>
+
+        <form onSubmit={handleSubmit} style={formStyle}>
+          {/* Row 1: Course Name & Price */}
+          <div style={gridStyle2}>
+            <Field 
+              label="اسم المنتج/الكورس *"
+              error={fieldErrors.course_name}
+              required
+            >
+              <input
+                type="text"
+                value={formData.course_name}
+                onChange={(e) => handleInputChange('course_name', e.target.value)}
+                placeholder="مثال: رياضيات - الصف الخامس"
+                required
+                style={inputStyle}
+              />
+            </Field>
+            
+            <Field 
+              label="السعر (AED) *"
+              error={fieldErrors.price_aed}
+              required
+            >
+              <input
+                type="number"
+                value={formData.price_aed}
+                onChange={(e) => handleInputChange('price_aed', e.target.value)}
+                placeholder="0.00"
+                required
+                step="0.01"
+                min="0.01"
+                style={inputStyle}
+              />
+            </Field>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#1B2B6B' }}>
-                  اسم المنتج/الكورس *
-                </label>
-                <input
-                  type="text"
-                  value={formData.course_name}
-                  onChange={(e) => setFormData({...formData, course_name: e.target.value})}
-                  placeholder="مثل: رياضيات - الصف الخامس"
-                  required
-                  style={inputStyle}
-                />
-              </div>
-              
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#1B2B6B' }}>
-                  السعر (AED) *
-                </label>
-                <input
-                  type="number"
-                  value={formData.price_aed}
-                  onChange={(e) => setFormData({...formData, price_aed: e.target.value})}
-                  placeholder="0"
-                  required
-                  step="0.01"
-                  style={inputStyle}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#1B2B6B' }}>
-                  الصف الدراسي
-                </label>
-                <input
-                  type="text"
-                  value={formData.grade}
-                  onChange={(e) => setFormData({...formData, grade: e.target.value})}
-                  placeholder="مثل: الصف الخامس"
-                  style={inputStyle}
-                />
-              </div>
-              
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#1B2B6B' }}>
-                  المادة
-                </label>
-                <input
-                  type="text"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                  placeholder="مثل: الرياضيات"
-                  style={inputStyle}
-                />
-              </div>
-              
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#1B2B6B' }}>
-                  البلد
-                </label>
-                <select
-                  value={formData.country}
-                  onChange={(e) => setFormData({...formData, country: e.target.value})}
-                  style={inputStyle}
-                >
-                  <option value="">اختر البلد</option>
-                  <option value="UAE">الإمارات</option>
-                  <option value="Kuwait">الكويت</option>
-                  <option value="Qatar">قطر</option>
-                  <option value="KSA">المملكة العربية السعودية</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600, color: '#1B2B6B' }}>
-                الوصف
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="وصف تفصيلي للكورس أو المنتج"
-                rows={3}
-                style={{...inputStyle, resize: 'vertical', minHeight: '80px'}}
+          {/* Row 2: Grade, Subject, Country */}
+          <div style={gridStyle3}>
+            <Field label="الصف الدراسي" error={fieldErrors.grade}>
+              <input
+                type="text"
+                value={formData.grade}
+                onChange={(e) => handleInputChange('grade', e.target.value)}
+                placeholder="مثال: الصف الخامس"
+                style={inputStyle}
               />
-            </div>
-
-            <div style={{ display: 'flex', gap: '15px' }}>
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  flex: 1,
-                  padding: '14px',
-                  background: loading ? '#ccc' : 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  transition: 'opacity 0.3s'
-                }}
+            </Field>
+            
+            <Field label="المادة" error={fieldErrors.subject}>
+              <input
+                type="text"
+                value={formData.subject}
+                onChange={(e) => handleInputChange('subject', e.target.value)}
+                placeholder="مثال: الرياضيات"
+                style={inputStyle}
+              />
+            </Field>
+            
+            <Field label="البلد" error={fieldErrors.country}>
+              <select
+                value={formData.country}
+                onChange={(e) => handleInputChange('country', e.target.value)}
+                style={selectStyle}
               >
-                {loading ? '⏳ جاري الإنشاء...' : 'إنشاء رابط الدفع ←'}
+                <option value="">اختر البلد</option>
+                <option value="UAE">🇦🇪 الإمارات</option>
+                <option value="Kuwait">🇰🇼 الكويت</option>
+                <option value="Qatar">🇶🇦 قطر</option>
+                <option value="KSA">🇸🇦 السعودية</option>
+              </select>
+            </Field>
+          </div>
+
+          {/* Description */}
+          <Field label="الوصف">
+            <textarea
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              placeholder="وصف تفصيلي للكورس أو المنتج (اختياري)"
+              rows={4}
+              style={textareaStyle}
+            />
+          </Field>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={submitButtonStyle}
+          >
+            {loading ? (
+              <>
+                <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⏳</span>
+                جاري الإنشاء...
+              </>
+            ) : (
+              'إنشاء رابط الدفع ←'
+            )}
+          </button>
+        </form>
+
+        {error && <Alert type="error">{error}</Alert>}
+
+        {result && (
+          <div style={successCardStyle}>
+            <h3 style={successTitleStyle}>✅ تم إنشاء رابط الدفع بنجاح!</h3>
+            
+            <div style={linkContainerStyle}>
+              <label style={linkLabelStyle}>رابط الدفع (اضغط للنسخ):</label>
+              <div style={linkBoxStyle} onClick={() => navigator.clipboard.writeText(result.checkout_url)} title="اضغط للنسخ">
+                {result.checkout_url}
+              </div>
+              <button 
+                onClick={() => { navigator.clipboard.writeText(result.checkout_url); alert('تم نسخ الرابط!') }}
+                style={copyButtonStyle}
+              >
+                📋 نسخ الرابط
               </button>
             </div>
-          </form>
 
-          {error && (
-            <div style={{
-              marginTop: '20px',
-              padding: '15px',
-              background: '#fff0f0',
-              color: '#d32f2f',
-              borderRadius: '12px',
-              fontSize: '14px'
-            }}>
-              {error}
+            <div style={detailsGridStyle}>
+              <DetailCard label="معرف المنتج في Stripe" value={result.product_id} />
+              <DetailCard label="معرف السعر في Stripe" value={result.price_id} />
             </div>
-          )}
 
-          {result && (
-            <div style={{
-              marginTop: '30px',
-              padding: '25px',
-              background: '#f0f9f0',
-              border: '2px solid #27ae60',
-              borderRadius: '16px'
-            }}>
-              <h3 style={{ color: '#27ae60', fontWeight: 900, margin: '0 0 15px', fontSize: '18px' }}>
-                ✅ تم إنشاء رابط الدفع بنجاح!
-              </h3>
-              
-              <div style={{ marginBottom: '15px' }}>
-                <strong>رابط الدفع:</strong>
-                <div style={{
-                  marginTop: '8px',
-                  padding: '12px',
-                  background: '#ffffff',
-                  borderRadius: '10px',
-                  wordBreak: 'break-all',
-                  fontSize: '13px'
-                }}>
-                  {result.checkout_url}
-                </div>
-                <button
-                  onClick={() => navigator.clipboard.writeText(result.checkout_url)}
-                  style={{
-                    marginTop: '8px',
-                    padding: '6px 12px',
-                    background: '#27ae60',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontWeight: 600
-                  }}
-                >
-                  نسخ الرابط
-                </button>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '15px' }}>
-                <div>
-                  <strong>معرف المنتج في شريطـStripe:</strong>
-                  <div style={{ fontSize: '13px', color: '#666', marginTop: '5px' }}>{result.product_id}</div>
-                </div>
-                <div>
-                  <strong>معرف السعر في شريطـStripe:</strong>
-                  <div style={{ fontSize: '13px', color: '#666', marginTop: '5px' }}>{result.price_id}</div>
-                </div>
-              </div>
-              
-              <div style={{ marginTop: '15px', padding: '10px', background: '#e8f5e8', borderRadius: '8px', fontSize: '13px' }}>
-                <strong>تفاصيل الكورس:</strong> {result.course_name}<br/>
-                <strong>السعر:</strong> {result.price_aed} {result.currency?.toUpperCase()}<br/>
-                <strong>صالح لمدة:</strong> حتى {new Date(result.expires_at * 1000).toLocaleString('ar-SA')}
-              </div>
+            <div style={infoCardStyle}>
+              <strong>تفاصيل الكورس:</strong> {result.course_name}<br/>
+              <strong>السعر:</strong> {result.price_aed} {result.currency?.toUpperCase()}<br/>
+              <strong>صالح حتى:</strong> {new Date(result.expires_at * 1000).toLocaleString('ar-SA', { 
+                year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+              })}
             </div>
-          )}
-        </div>
+
+            <div style={testLinkStyle}>
+              <a 
+                href={result.checkout_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={testLinkButtonStyle}
+              >
+                🧪 اختبار رابط الدفع (يفتح في تبويب جديد)
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
+// Components
+const Field = ({ label, children, error, required }: { 
+  label: string; 
+  children: React.ReactNode; 
+  error?: string; 
+  required?: boolean 
+}) => (
+  <div style={fieldWrapperStyle}>
+    <label style={labelStyle}>{label} {required && <span style={requiredStyle}>*</span>}</label>
+    <div style={inputWrapperStyle}>{children}</div>
+    {error && <span style={errorStyle}>{error}</span>}
+  </div>
+)
+
+const Alert = ({ type, children }: { type: 'error'; children: React.ReactNode }) => (
+  <div style={type === 'error' ? alertErrorStyle : alertSuccessStyle}>{children}</div>
+)
+
+const DetailCard = ({ label, value }: { label: string; value: string }) => (
+  <div style={detailCardStyle}>
+    <span style={detailLabelStyle}>{label}</span>
+    <code style={detailValueStyle}>{value}</code>
+  </div>
+)
+
+// Styles
+const containerStyle = {
+  minHeight: '100vh',
+  background: '#f8fafc',
+  fontFamily: '"Cairo", system-ui, sans-serif',
+  direction: 'rtl' as const,
+  padding: '24px 16px'
+}
+
+const cardStyle = {
+  maxWidth: '900px',
+  margin: '0 auto',
+  background: '#ffffff',
+  borderRadius: '16px',
+  boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+  padding: '32px 24px'
+}
+
+const headerStyle = {
+  textAlign: 'center' as const,
+  marginBottom: '32px',
+  paddingBottom: '24px',
+  borderBottom: '1px solid #eef2f7'
+}
+
+const logoStyle = { height: '48px', marginBottom: '16px' }
+const titleStyle = { color: '#1B2B6B', fontWeight: 900, fontSize: '28px', margin: '0 0 8px', lineHeight: 1.2 }
+const subtitleStyle = { color: '#6b7280', fontSize: '15px', margin: 0, fontWeight: 500 }
+
+const formStyle = { display: 'flex', flexDirection: 'column' as const, gap: '24px' }
+
+const gridStyle2 = { 
+  display: 'grid', 
+  gap: '20px',
+  gridTemplateColumns: '1fr',
+  '@media (min-width: 640px)': { gridTemplateColumns: '1fr 1fr' }
+}
+
+const gridStyle3 = { 
+  display: 'grid', 
+  gap: '20px',
+  gridTemplateColumns: '1fr',
+  '@media (min-width: 640px)': { gridTemplateColumns: '1fr 1fr' },
+  '@media (min-width: 1024px)': { gridTemplateColumns: '1fr 1fr 1fr' }
+}
+
+const fieldWrapperStyle = { display: 'flex', flexDirection: 'column' as const, gap: '6px' }
+const labelStyle = { display: 'block', fontWeight: 600, color: '#1B2B6B', fontSize: '14px' }
+const requiredStyle = { color: '#e11d48', marginRight: '4px' }
+const inputWrapperStyle = { width: '100%' }
+const errorStyle = { color: '#e11d48', fontSize: '12px', fontWeight: 500, marginTop: '4px' }
+
 const inputStyle = {
-  padding: '12px 16px',
+  width: '100%',
+  padding: '14px 16px',
   borderRadius: '10px',
-  border: '2px solid #e0e0e0',
-  fontSize: '14px',
+  border: '2px solid #e5e7eb',
+  fontSize: '15px',
   fontWeight: 600,
   color: '#1B2B6B',
   outline: 'none',
-  transition: 'border-color 0.3s',
-  fontFamily: 'Cairo'
+  transition: 'border-color 0.2s, box-shadow 0.2s',
+  fontFamily: '"Cairo", system-ui, sans-serif',
+  boxSizing: 'border-box' as const,
+  background: '#fff'
 }
+
+const selectStyle = {
+  ...inputStyle,
+  cursor: 'pointer',
+  appearance: 'none' as const,
+  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E\")",
+  backgroundPosition: 'left 12px center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: '16px',
+  paddingRight: '40px'
+}
+
+const textareaStyle = {
+  ...inputStyle,
+  resize: 'vertical' as const,
+  minHeight: '100px',
+  lineHeight: 1.6
+}
+
+const submitButtonStyle = {
+  width: '100%',
+  padding: '16px 24px',
+  background: 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
+  color: '#ffffff',
+  border: 'none',
+  borderRadius: '12px',
+  fontSize: '17px',
+  fontWeight: 800,
+  cursor: 'pointer',
+  fontFamily: '"Cairo", system-ui, sans-serif',
+  transition: 'transform 0.15s, box-shadow 0.15s',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  marginTop: '8px'
+}
+
+const alertErrorStyle = {
+  padding: '14px 18px',
+  background: '#fef2f2',
+  color: '#e11d48',
+  borderRadius: '10px',
+  fontSize: '14px',
+  fontWeight: 500,
+  border: '1px solid #fecaca'
+}
+
+const alertSuccessStyle = {
+  padding: '14px 18px',
+  background: '#f0fdf4',
+  color: '#166534',
+  borderRadius: '10px',
+  fontSize: '14px',
+  fontWeight: 500,
+  border: '1px solid #bbf7d0'
+}
+
+const successCardStyle = {
+  marginTop: '32px',
+  padding: '28px',
+  background: '#f0fdf4',
+  border: '2px solid #22c55e',
+  borderRadius: '14px'
+}
+
+const successTitleStyle = { color: '#166534', fontWeight: 900, fontSize: '20px', margin: '0 0 20px' }
+
+const linkContainerStyle = { marginBottom: '20px' }
+const linkLabelStyle = { display: 'block', fontWeight: 600, color: '#1B2B6B', fontSize: '14px', marginBottom: '8px' }
+const linkBoxStyle = {
+  padding: '14px 16px',
+  background: '#ffffff',
+  borderRadius: '10px',
+  wordBreak: 'break-all' as const,
+  fontSize: '13px',
+  fontFamily: 'monospace',
+  color: '#1B2B6B',
+  border: '1px solid #e5e7eb',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  userSelect: 'all' as const,
+  transition: 'background 0.15s'
+}
+
+const copyButtonStyle = {
+  marginTop: '10px',
+  padding: '10px 18px',
+  background: '#22c55e',
+  color: 'white',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  fontSize: '13px',
+  fontWeight: 600,
+  fontFamily: '"Cairo", system-ui, sans-serif',
+  transition: 'background 0.15s'
+}
+
+const detailsGridStyle = {
+  display: 'grid',
+  gap: '16px',
+  marginTop: '20px',
+  gridTemplateColumns: '1fr',
+  '@media (min-width: 640px)': { gridTemplateColumns: '1fr 1fr' }
+}
+
+const detailCardStyle = {
+  padding: '16px',
+  background: '#ffffff',
+  border: '1px solid #e5e7eb',
+  borderRadius: '10px'
+}
+
+const detailLabelStyle = { display: 'block', fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '6px' }
+const detailValueStyle = { fontSize: '13px', color: '#1B2B6B', fontFamily: 'monospace', wordBreak: 'break-all' as const }
+
+const infoCardStyle = {
+  marginTop: '20px',
+  padding: '18px',
+  background: '#eff6ff',
+  border: '1px solid #bfdbfe',
+  borderRadius: '10px',
+  fontSize: '14px',
+  color: '#1e40af',
+  lineHeight: 1.8
+}
+
+const testLinkStyle = { marginTop: '24px', textAlign: 'center' as const }
+const testLinkButtonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '14px 28px',
+  background: 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
+  color: '#ffffff',
+  border: 'none',
+  borderRadius: '12px',
+  fontSize: '16px',
+  fontWeight: 700,
+  cursor: 'pointer',
+  fontFamily: '"Cairo", system-ui, sans-serif',
+  textDecoration: 'none',
+  transition: 'transform 0.15s, box-shadow 0.15s'
+}
+
+export default CreatePaymentLinkPage
