@@ -64,23 +64,11 @@ export default function AdminPage() {
         <div style={{ padding: '40px 32px' }}>
           {/* Logo */}
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <div style={{
-              width: '72px',
-              height: '72px',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, #1B2B6B 0%, #8B1A3A 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-              boxShadow: '0 4px 16px rgba(27,43,107,0.2)'
-            }}>
-              <img
-                src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
-                alt="Brilliant Academy"
-                style={{ height: '40px', width: 'auto' }}
-              />
-            </div>
+            <img
+              src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
+              alt="Brilliant Academy"
+              style={{ height: '64px', width: 'auto', marginBottom: '16px' }}
+            />
             <h1 style={{
               color: '#1B2B6B',
               fontWeight: 900,

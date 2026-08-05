@@ -110,22 +110,11 @@ export default function CreatePaymentLinkPage() {
           borderRadius: '16px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
-          <div style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #1B2B6B 0%, #8B1A3A 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
-          }}>
-            <img
-              src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
-              alt="Brilliant Academy"
-              style={{ height: '28px', width: 'auto' }}
-            />
-          </div>
+          <img
+            src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
+            alt="Brilliant Academy"
+            style={{ height: '36px', width: 'auto', flexShrink: 0 }}
+          />
           <div>
             <h1 style={{
               color: '#1B2B6B',
