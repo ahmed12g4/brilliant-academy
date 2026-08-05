@@ -13,14 +13,14 @@ export default function AdminPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     try {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       })
-      
+
       if (res.ok) {
         router.push('/admin/payments/create')
       } else {
@@ -34,112 +34,206 @@ export default function AdminPage() {
     }
   }
 
-  const buttonStyle = {
-    padding: '16px',
-    background: loading ? '#ccc' : 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '12px',
-    fontSize: '16px',
-    fontWeight: 800,
-    cursor: loading ? 'not-allowed' : 'pointer',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-    fontFamily: 'Cairo'
-  }
-
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #1B2B6B 0%, #8B1A3A 100%)',
+    <div style={{
+      minHeight: '100vh',
+      background: '#f0f2f5',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: 'Cairo',
-      direction: 'rtl'
+      direction: 'rtl',
+      padding: '20px'
     }}>
-      <div style={{ 
-        background: '#ffffff',
-        borderRadius: '24px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
-        padding: '50px',
-        maxWidth: '400px',
+      <div style={{
         width: '100%',
-        textAlign: 'center'
+        maxWidth: '420px',
+        background: '#ffffff',
+        borderRadius: '20px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+        overflow: 'hidden'
       }}>
-        <div style={{ marginBottom: '30px' }}>
-          <img 
-            src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
-            alt="Brilliant Academy"
-            style={{ height: '60px', marginBottom: '20px' }}
-          />
-          <h1 style={{ color: '#1B2B6B', fontWeight: 900, fontSize: '24px', margin: 0 }}>
-            لوحة تحكم أكاديمية بريلينت
-          </h1>
-          <p style={{ color: '#666', fontSize: '14px', margin: '10px 0 0', fontWeight: 600 }}>
-            أدخل كلمة المرور للوصول إلى إنشاء رابط الدفع
-          </p>
-        </div>
+        {/* Top accent bar */}
+        <div style={{
+          height: '4px',
+          background: 'linear-gradient(90deg, #1B2B6B, #8B1A3A)',
+          width: '100%'
+        }} />
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ textAlign: 'right' }}>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
-              fontWeight: 700, 
-              color: '#1B2B6B',
-              fontSize: '14px'
+        {/* Content */}
+        <div style={{ padding: '40px 32px' }}>
+          {/* Logo */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{
+              width: '72px',
+              height: '72px',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, #1B2B6B 0%, #8B1A3A 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              boxShadow: '0 4px 16px rgba(27,43,107,0.2)'
             }}>
-              كلمة المرور
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="أدخل كلمة المرور للوصول"
-              required
-              style={inputStyle}
-            />
+              <img
+                src="https://assets.cdn.filesafe.space/lTNn7BkMGcm52L4pwJS0/media/69afadb7c509a0bfb75719bb.png"
+                alt="Brilliant Academy"
+                style={{ height: '40px', width: 'auto' }}
+              />
+            </div>
+            <h1 style={{
+              color: '#1B2B6B',
+              fontWeight: 900,
+              fontSize: '22px',
+              margin: '0 0 6px',
+              letterSpacing: '-0.3px'
+            }}>
+              أكاديمية بريلينت
+            </h1>
+            <p style={{
+              color: '#888',
+              fontSize: '13px',
+              margin: 0,
+              fontWeight: 500
+            }}>
+              تسجيل الدخول للوحة التحكم
+            </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={buttonStyle}
-          >
-            {loading ? '⏳ جاري التحقق...' : 'دخول إلى لوحة التحكم ←'}
-          </button>
-
-          {error && (
-            <div style={errorStyle}>
-              {error}
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: 700,
+                color: '#374151',
+                fontSize: '14px'
+              }}>
+                كلمة المرور
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{
+                  position: 'absolute',
+                  right: '14px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: '18px',
+                  opacity: 0.4
+                }}>
+                  🔒
+                </span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="أدخل كلمة المرور"
+                  required
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '14px 44px 14px 16px',
+                    borderRadius: '12px',
+                    border: '2px solid #e5e7eb',
+                    fontSize: '15px',
+                    fontWeight: 500,
+                    color: '#1B2B6B',
+                    outline: 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    fontFamily: 'Cairo',
+                    boxSizing: 'border-box',
+                    background: '#fafafa'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#8B1A3A'
+                    e.target.style.boxShadow = '0 0 0 3px rgba(139,26,58,0.1)'
+                    e.target.style.background = '#fff'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.boxShadow = 'none'
+                    e.target.style.background = '#fafafa'
+                  }}
+                />
+              </div>
             </div>
-          )}
-        </form>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '16px',
+                background: loading ? '#9ca3af' : 'linear-gradient(135deg, #8B1A3A 0%, #c0392b 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: 800,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontFamily: 'Cairo',
+                boxShadow: loading ? 'none' : '0 4px 12px rgba(139,26,58,0.3)',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              {loading ? (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ animation: 'spin 1s linear infinite' }}>
+                    <circle cx="10" cy="10" r="8" stroke="white" strokeWidth="2" strokeDasharray="40" strokeDashoffset="10" />
+                  </svg>
+                  جاري التحقق...
+                </>
+              ) : (
+                'دخول ←'
+              )}
+            </button>
+
+            {error && (
+              <div style={{
+                padding: '12px 16px',
+                background: '#fef2f2',
+                color: '#dc2626',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 600,
+                textAlign: 'center',
+                border: '1px solid #fecaca'
+              }}>
+                {error}
+              </div>
+            )}
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '16px 32px',
+          background: '#f9fafb',
+          borderTop: '1px solid #f3f4f6',
+          textAlign: 'center'
+        }}>
+          <p style={{
+            color: '#9ca3af',
+            fontSize: '12px',
+            margin: 0,
+            fontWeight: 500
+          }}>
+            © {new Date().getFullYear()} أكاديمية بريلينت
+          </p>
+        </div>
       </div>
+
+      {/* Spin animation */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
-}
-
-const inputStyle = {
-  width: '100%',
-  padding: '14px 16px',
-  borderRadius: '12px',
-  border: '2px solid #e0e0e0',
-  fontSize: '15px',
-  fontWeight: 600,
-  color: '#1B2B6B',
-  outline: 'none',
-  transition: 'border-color 0.3s',
-  fontFamily: 'Cairo',
-  textAlign: 'right' as const
-}
-
-const errorStyle = {
-  padding: '12px 16px',
-  background: '#fff0f0',
-  color: '#d32f2f',
-  borderRadius: '12px',
-  fontSize: '14px',
-  fontWeight: 600,
-  marginTop: '10px'
 }
