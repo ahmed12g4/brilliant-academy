@@ -5,9 +5,9 @@ import { cookies } from 'next/headers'
 // Check if password is set in environment variables
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
 
-function isAuthenticated(request: NextRequest): boolean {
+async function isAuthenticated(request: NextRequest): Promise<boolean> {
   // First check for password in cookie
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const passwordCookie = cookieStore.get('admin_pass')
   
   if (passwordCookie && ADMIN_PASSWORD) {
