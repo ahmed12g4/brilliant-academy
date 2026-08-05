@@ -23,8 +23,7 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
   return false
 }
 
-function calculateExpiresAt(hours: number): number | undefined {
-  if (hours <= 0) return undefined
+function calculateExpiresAt(hours: number): number {
   const maxHours = 23
   const cappedHours = Math.min(hours, maxHours)
   return Math.floor(Date.now() / 1000) + (cappedHours * 60 * 60)
@@ -92,7 +91,7 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}&product=${stripeProduct.id}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment/cancel`,
-      ...(expiresAt ? { expires_at: expiresAt } : {}),
+      expires_at: expiresAt,
       metadata: {
         course_name,
         price_aed: price_aed.toString(),
@@ -103,18 +102,18 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({
-      success: true,
-      product_id: stripeProduct.id,
-      price_id: stripePrice.id,
-      checkout_url: checkoutSession.url,
-      expires_at: checkoutSession.expires_at,
-      expires_in_hours: expires_in_hours === 0 ? null : expires_in_hours,
-      course_name,
-      price_aed,
-      currency,
-      message: 'تم إنشاء رابط الدفع بنجاح في Stripe'
-    })
+return NextResponse.json({
+       success: true,
+       product_id: stripeProduct.id,
+       price_id: stripePrice.id,
+       checkout_url: checkoutSession.url,
+       expires_at: checkoutSession.expires_at,
+       expires_in_hours: expires_in_hours,
+       course_name,
+       price_aed,
+       currency,
+       message: 'تم إنشاء رابط الدفع بنجاح في Stripe'
+     })
   } catch (error) {
     console.error('خطأ في إنشاء رابط الدفع:', error)
     const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف'
