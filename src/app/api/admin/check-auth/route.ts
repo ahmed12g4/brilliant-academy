@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from 'next/server'
+
 export async function GET(request: NextRequest) {
   try {
     // Check auth via cookies (same as middleware)
