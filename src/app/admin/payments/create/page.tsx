@@ -14,7 +14,7 @@ export default function CreatePaymentLinkPage() {
   })
   
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState<{ checkout_url: string; product_id: string; price_id: string; expires_at: number; course_name: string; price_aed: number; currency: string } | null>(null)
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
