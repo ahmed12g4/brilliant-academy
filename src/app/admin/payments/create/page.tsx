@@ -470,5 +470,3 @@ const testLinkButtonStyle = {
   textDecoration: 'none',
   transition: 'transform 0.15s, box-shadow 0.15s'
 }
-
-export default CreatePaymentLinkPage
